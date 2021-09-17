@@ -495,7 +495,7 @@ Then, we formally specify the protocol in Maude~\cite{Clavel2007LNCS}, a rewriti
 The experiment with six vehicles participating shows that the protocol enjoys the mutual exclusion property.
 
 The rest of this paper is organized as follows. Sect.\,\ref{sect_Prel}
-mentions some preliminaries such as state machines, and Maude.
+mentions some preliminaries such as Kripke structure, and Maude.
 Sect.\,\ref{sect_oriproto} introduces the \textit{merging} protocol.
 Sect.\,\ref{sect_reviproto} describes our revised version of the protocol.
 In Sect.\,\ref{sect_formal}, we specify our proposed protocol in Maude and model check some properties in Sect.\,\ref{sect_model}.
@@ -863,10 +863,10 @@ Transitions are explained as follows:
     \item there is no vehicle crossing the merge point and the system is in a fully-prioritized state. %2
     \item the vehicle crossed the merge point. %3
     \item the through lane is congested (i.e., the number of vehicles running on the through lane greater than a specific number), and there is no vehicle crossing the merge point.  %4
-    \item the system is in a fair state, and it is the through lane vehicle's turn, and there is no vehicle crossing the merge point. %5
+    \item the system is in a fair state, and it is the through lane vehicle's turn, and there is no vehicle crossing the merge point (from \textit{approaching} to \textit{crossing}). %5
     \item the  system is in a fair state and it is the non-through lane vehicle's turn. %6
     \item the  system is not in a fair state. %7
-    \item the system is in a fair state, and it is the through lane vehicle's turn, and there is no vehicle crossing the merge point. %8
+    \item the system is in a fair state, and it is the through lane vehicle's turn, and there is no vehicle crossing the merge point (from \textit{halting} to \textit{crossing}). %8
 \end{enumerate}
 
 Initially, each through lane vehicle has \textit{running} status, which mean that the vehicle is far away from the merge point.
@@ -910,16 +910,16 @@ Transitions are explained as follows:
 \begin{itemize}
     \item[a)] the vehicle is approaching the merge point. %1
     \item[b)] there exists a through lane vehicle that is approaching the merge point, and the system is not in a fair state. %2
-    \item[c)] there is no vehicle on the through lane that is approaching the merge point, and the system is not in a fair state, and there is no vehicle crossing the merge point. %3
+    \item[c)] there is no vehicle on the through lane that is approaching the merge point, and the system is not in a fair state, and there is no vehicle crossing the merge point (from \textit{approaching} to \textit{crossing}). %3
     \item[d)] the vehicle crossed the merge point. %4
-    \item[e)] there is no vehicle on through lane that is approaching the merge point, and the system is not in a fair state, and there is no vehicle crossing the merge point. %5
+    \item[e)] there is no vehicle on the through lane that is approaching the merge point, and the system is not in a fair state, and there is no vehicle crossing the merge point (from \textit{stopped} to \textit{crossing}). %5
     \item[f)] the system is in a semi-prioritized state, and there is no vehicle crossing the merge point. %6
     \item[g)] the system is in a fair state, and it is the non-through lane vehicle's turn, and there is no vehicle crossing the merge point. %7
-    \item[h)] the system is in a fair state, and it is the through lane vehicle's turn. %8
+    \item[h)] the system is in a fair state, and it is the through lane vehicle's turn (from \textit{approaching} to \textit{stoped}). %8
     \item[i)] the system is not in a fair state. %9
-    \item[j)] the system is in a fair state, and it is the through lane vehicle's turn. %10
-    \item[k)] the system is in a fair state, and it is the non-through lane vehicle's turn, and there is no vehicle crossing the merge point. %11
-    \item[l)] the system is in a fair state, and it is the non-through lane vehicle's turn, and there is no vehicle crossing the merge point. %12
+    \item[j)] the system is in a fair state, and it is the through lane vehicle's turn (from \textit{stopped} to \textit{halting}). %10
+    \item[k)] the system is in a fair state, and it is the non-through lane vehicle's turn, and there is no vehicle crossing the merge point (from \textit{halting} to \textit{crossing}). %11
+    \item[l)] the system is in a fair state, and it is the non-through lane vehicle's turn, and there is no vehicle crossing the merge point (from \textit{stopped} to \textit{crossing}). %12
 \end{itemize}
 
 Initially, all non-through lane vehicles receive \textit{running} as their statuses.
@@ -1572,8 +1572,8 @@ Consequently, we can conclude that the protocol enjoys the \textit{starvation fr
  They define Conflicting Area (CA) where collisions could occur, and Cooperative Zone (CZ) where each vehicle is able to communicate with its neighbors. 
  The authors describe their problem into undirected graph where a node represents a vehicle and an edge represents a communication link between two vehicles.
  The experiment uses three autonomous vehicle to confirm their effective theoretical analysis.
- Currently, we do not find any other works to use formal methods for this work.
- One piece of our future is to specify this protocol and make it more reliable by formal methods.
+ Currently, we do not find any works to use formal methods for this work.
+ One piece of our future work is to specify this protocol and make it more reliable by formal methods.
  
  
 
@@ -1588,11 +1588,11 @@ Consequently, we can conclude that the protocol enjoys the \textit{starvation fr
 \label{concl_sect}
 
 We have proposed a protocol call \textit{a-merging} protocol based on the a merging protocol~\cite{10.1145/3055004.3055028}, formally specified and conducted some experiments by model checking in Maude.
+Three properities such as, \textit{mutual exclusion}, \textit{deadlock} and \textit{starvation freedom}, have been model checked with the traffic containing three vehicles and spaces on both lanes.
 %We have revised the \textit{Autonomous Vehicle Protocol for Merge Points} \cite{10.1145/3055004.3055028} and some case studies in our revised protocol and formal specified it in Maude.
 %We also model checked our formal specification with Maude model checking facilities.
-We have encountered the state explosion problem when we tried to put more vehicle running on two lanes to model check our abstract protocol enjoys some properties in other situations.
-In the future, we need to use theorem proving, such as CafeOBJ~\cite{DiaconescuF98}, to prove our proposed protocol enjoys some desired properties in general.
-
+We have encountered the state explosion problem when we add more vehicle on two lanes.
+In the future, we need to use theorem proving, such as CafeOBJ~\cite{DiaconescuF98}, to prove our abstract protocol enjoys some desired properties in general.
 
 
 % An example of a floating figure using the graphicx package.
