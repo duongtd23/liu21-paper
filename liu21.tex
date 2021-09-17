@@ -1425,18 +1425,19 @@ Those rewrite rules can be found in the webpage shown in the Sect.~\ref{sect_int
  
 \section{Model Checking}
 \label{sect_model}
-Our \textit{a-merging} protocol has three desired properties the protocol should enjoy.
+There are three desired properties the \textit{a-merging} protocol should enjoy:
 \begin{itemize}
-    \item \textit{Mutual exclusion} - No two vehicles in merge point at the same time.
-    \item \textit{Deadlock freedom} - If a vehicle is trying to cross the merge point, a vehicle, may not the same one, finally crossed the intersection.
-    \item \textit{Starvation freedom} - If a vehicle is trying to cross the merge point, then the vehicle must finally pass the merge point in finite time.
+    \item \textit{Mutual exclusion} - There is at most one vehicle crossing the merge point at any given time.
+    \item \textit{Deadlock freedom} - There is no deadlock state.
+    \item \textit{Starvation freedom} - If a vehicle is trying to cross the merge point, then the vehicle must eventually pass the merge point.
 \end{itemize}
 
 %We need an initial state that can cover all three states in our \textit{Revised Autonomous Vehicle Protocol for Merge Points}.
 %Therefore, we put two space and three vehicles on the through lane, one space and three vehicles on the non-through lane.
-To cover all situations (three states) in the \textit{a-merging} protocol, we assume that two spaces and three vehicles on the through lane, one space and three vehicles on the non-through lane.
-The \verb!init! is shown as follows:
+%To cover all situations (three states) in the \textit{a-merging} protocol, we assume that two spaces and three vehicles on the through lane, one space and three vehicles on the non-through lane.
+%The \verb!init! is shown as follows:
 
+For the three experiments checking that the protocol enjoys the three properties mentioned above, we use the same initial state in which there are six vehicles participating. The initial state namely\verb!init! is defined as follows:
 \begin{small}
 \begin{verbatim}
 {(gstat: nFin) 
@@ -1453,6 +1454,10 @@ noFair,noVeInNTLane,0)} .
 \end{verbatim}
 \end{small}
 
+\noindent
+Three vehicles run on the through lane, while three others arrive from the non-through lane.
+Furthermore, we also assume that there exist three space locations.
+
 \subsection{Mutual exclusion}
 
 The \textit{mutual exclusion} property can be checked by the following search commmand:
@@ -1466,13 +1471,14 @@ init =>* {(v[VI]: LN, crossing)
 \end{verbatim}
 \end{small}
 
-The \verb!MTAS15! is the specification of the \textit{a-merging} protocol.
-The search commands tries to find a state from the initial state \verb!init! such that two vehicle is crossing the merge point.
-It does not find any such states which means our \textit{a-merging} protocol enjoys the \textit{mutual exclusion} property for the initial state.
-
+\noindent
+where \verb!MTAS15! is the specification of the \textit{a-merging} protocol.
+The search commands tries to find a state from the initial state \verb!init! such that two vehicles are crossing the merge point.
+After about 2 minutes, Maude finished without finding any such a state.
+It confirms that when  there are six vehicles participating, the protocol enjoys the \textit{mutual exclusion} property.
 
 \subsection{Deadlock freedom}
-The \textit{deadlock freedom} can be checked by the following commend:
+To check that there is no deadlock state, we use the following command:
 
 \begin{small}
 \begin{verbatim}
@@ -1480,37 +1486,74 @@ search [1] in MTAS15 : init =>! {OCs} .
 \end{verbatim}
 \end{small}
 
-This command tries to find a state that cannot let all vehicles crossed the merge point. 
-It does not find any such state.
-Therefore, our \textit{a-merging} protocol also enjoy the \textit{deadlock freedom} property for the \verb!init!.
+\noindent
+%This command tries to find a state that cannot let all vehicles crossed the merge point. 
+No state was found. The experiment finished after around 2 minutes.
+%It does not find any such state.
+%Therefore, our \textit{a-merging} protocol also enjoy the \textit{deadlock freedom} property for the \verb!init!.
 
 
 \subsection{Starvation freedom}
-To model check that the \textit{a-merging} protocol enjoys the \textit{starvation freedom}, we need to define $P_{a-merging}$ and $L_{a-merging}$. 
-$P_{a-merging}$ consists of one atomic proposition \verb!Fin!.
-$L_{a-merging}$ is defined as follows:
+To model check that the protocol enjoys the \textit{starvation freedom} property, we need to employ Maude LTL model checking facilities.
+% define $P_{a-merging}$ and $L_{a-merging}$. 
+%$P_{a-merging}$ consists of one atomic proposition \verb!Fin!.
+%$L_{a-merging}$ is defined as follows:
+We first define two atomic propositions namely \verb!want! and \verb!passed! which takes a vehicle IDs as their argument. 
+They are defined via the following equations:
 
 \begin{small}
 \begin{verbatim}
-eq {(gstat: fin) OCs} |= Fin = true .
+eq {(v[VI]: L,approaching) OCs} |= 
+  want(VI) = true .
+eq {(v[VI]: L,crossed) OCs} |= 
+  passed(VI) = true .
 eq {OCs} |= PROP = false [owise] .
 \end{verbatim}
 \end{small}
 
-where \verb!PROP! is a Maude variable of atomic propositions, \verb!|=! is a Maude symbol for satisfaction relation in LTL. 
-The two equations mean that for all states $s$ $\in$ $P_{a-merging}L_{a-merging}(s)$ = {\verb!Fin!} if and only if $s$ contains (\verb!gstat : fin!). 
-The \textit{starvation freedom} property is then defined as follows:
+\noindent
+where \verb!PROP! is a Maude variable of atomic propositions, \verb!|=! is a Maude symbol for satisfaction relation in LTL,
+%The two equations mean that for all states $s$ $\in$ $P_{a-merging}L_{a-merging}(s)$ = {\verb!Fin!} if and only if $s$ contains (\verb!gstat : fin!). 
+\verb!owise! is the abbreviation of otherwise, indicating that this equation will only be applied if all of the previous equations above it cannot be applied. 
+The equations say that \verb!want(VI)! holds in a state $s$ iff $s$ contains \verb!(v[VI]: L,approaching)!, which means that the vehicle \verb!VI! is trying to enter the merge point. 
+Likewise, \verb!passed(VI)! holds in a state $s$ iff $s$ contains \verb!(v[VI]: L,crossed)!, which means that the vehicle \verb!VI! already passed the merge point. 
+
+The \textit{starvation freedom} property for each vehicle is then defined by the LTL formula \verb!lofree0!  as follows:
+%We also define two LTL formulas as follows:
 
 \begin{small}
 \begin{verbatim}
-eq halt = <> Fin .
+eq lofree0(VI) = (want(VI) |-> passed(VI)) .
 \end{verbatim}
 \end{small}
 
-\noindent where \verb!<>! is the LTL eventually connective $\diamondsuit$.
-We run the Maude command \verb!modelCheck(init, halt)! to check whether the protocol enjoys the \textit{starvation freedom} property.
-The program returns no counterexample.
-Therefore, the \textit{a-merging} protocol enjoys the property for the \verb!init!.
+\noindent
+The formula says that if a vehicle \verb!VI! trying to cross the merge point, it eventually will pass through the merge point.
+After that, the complete \textit{starvation freedom} property is specified by the LTL formula \verb!lofree! as follows:
+
+\begin{small}
+\begin{verbatim}
+eq lofree = lofree0(4) /\ lofree0(5) /\ 
+				lofree0(6) /\ lofree0(7) /\ 
+				lofree0(8) /\ lofree0(9).
+\end{verbatim}
+\end{small}
+
+The following command is used to model check the property:
+\begin{small}
+\begin{verbatim}
+red in MTAS15-CHECK : modelCheck(init,lofree) .
+\end{verbatim}
+\end{small}
+
+\noindent
+No counterexamples were found. It took about 2 minutes for Maude to complete the model checking. 
+Consequently, we can conclude that the protocol enjoys the \textit{starvation freedom} property with six vehicles participating in the protocol.
+
+%\noindent where \verb!<>! is the LTL eventually connective $\diamondsuit$.
+%We run the Maude command \verb!modelCheck(init, halt)! to check whether the protocol enjoys the \textit{starvation freedom} property.
+%The program returns no counterexample.
+%Therefore, the \textit{a-merging} protocol enjoys the property for the \verb!init!.
 
  
  
