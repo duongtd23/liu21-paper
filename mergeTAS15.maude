@@ -297,8 +297,16 @@ mod MTAS15-PREDS is
   ops Fin : -> Prop .
   var OCs : Soup{OComp} .
   var PROP : Prop .
+  vars VI : Nat .
+  vars L : Lane .
   eq {(gstat: fin) OCs} |= Fin = true .
   eq {OCs} |= PROP = false [owise] .
+
+  op want : Nat -> Prop .
+  op passed : Nat -> Prop .
+  eq {(v[VI]: L,approaching) OCs} |= want(VI) = true .
+  eq {(v[VI]: L,crossed) OCs} |= passed(VI) = true .
+
 endm
 
 mod MTAS15-CHECK is
@@ -307,9 +315,16 @@ mod MTAS15-CHECK is
   inc LTL-SIMPLIFIER .
   op halt  : -> Formula .
   eq halt = <> Fin .
+
+  op lofree0 : Nat -> Formula .
+  op lofree : -> Formula .
+  vars VI : Nat .
+  eq lofree0(VI) = (want(VI) |-> passed(VI)) .
+  eq lofree = lofree0(4) /\ lofree0(5) /\ lofree0(6) /\
+              lofree0(7) /\ lofree0(8) /\ lofree0(9).
 endm
 
-red in MTAS15-CHECK : modelCheck(init,halt) .
+red in MTAS15-CHECK : modelCheck(init,lofree) .
 
 --- show SEMI-PRIORITIZE
 --- search [1] in  MTAS15 : init =>* {(switch: noVehicleCrossing,semiPrioritized,noFair,veInNTLane,numOfVeInTLane) OCs} .
