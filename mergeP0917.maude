@@ -136,7 +136,7 @@ mod MTAS15 is
                     if L == Through .
     crl [full_N_stop] : {(gstat: nFin) (switch: B1,B2,B3,NT) (lane[L]: (VI ; VS)) (v[VI]: L,approaching) OCs}
                      => {(gstat: nFin) (switch: B1,B2,B3,NT) (lane[L]: (VI ; VS)) (v[VI]: L,stopped) OCs}
-                    if L == Nothrough /\ NT > 0 . ---> ??
+                    if L == Nothrough /\ NT > 0 /\ (B2 == fullP or B2 == semiP) .
     crl [full_N_crossing] : {(gstat: nFin) (switch: noVehicleCrossing,fullP,B3,0) (lane[L]: (VI ; VS)) (v[VI]: L,VeSt) OCs} 
                           => {(gstat: nFin) (switch: vehicleCrossing,fullP,B3,0) (lane[L]: (VI ; VS)) (v[VI]: L,crossing) OCs}
                     if L == Nothrough /\ (VeSt == approaching or VeSt == stopped) .
@@ -156,8 +156,6 @@ mod MTAS15 is
                        => {(gstat: nFin) (switch: B1,B2,B3,NT) (lane[L]: VS) OCs}
                     if L == Nothrough .
     --- switch the switch2 which tells Nothrough-lane vehicle it can enter (space situation).
-
---->??
     crl [semi_T_yield1] : {(gstat: nFin) (switch: noVehicleCrossing,B2,veInNTLane,NT) (lane[L]: (VI ; VI' ; VS)) (v[VI]: L,yield) OCs} 
                        => {(gstat: nFin) (switch: noVehicleCrossing,semiP,veInNTLane,NT) (lane[L]: (VI' ; VS)) OCs} 
                     if L == Through /\ (B2 == fullP or B2 == semiP) .
@@ -166,7 +164,7 @@ mod MTAS15 is
                     if L == Through /\ (B2 == fullP or B2 == semiP) .
     crl [semi_T_yield3] : {(gstat: nFin) (switch: noVehicleCrossing,fullP,noVeInNTLane,NT) (lane[L]: (VI ; VS)) (v[VI]: L,yield) OCs}
                        => {(gstat: nFin) (switch: noVehicleCrossing,fullP,noVeInNTLane,NT) (lane[L]: VS) OCs} 
-                    if L == Through . ---> TODO ???, is it needed to VS =/= empq
+                    if L == Through .
     --- Nothrough-lane vehicle enter the merge point when Through lane has space.
     crl [semi_N_crossing] : {(gstat: nFin) (switch: noVehicleCrossing,semiP,veInNTLane,NT) (lane[L]: (VI ; VS)) (v[VI]: L,stopped) OCs} 
                          => {(gstat: nFin) (switch: vehicleCrossing,semiP,veInNTLane,NT) (lane[L]: (VI ; VS)) (v[VI]: L,crossing) OCs}
@@ -186,7 +184,7 @@ mod MTAS15 is
                   => {(gstat: nFin) (switch: noVehicleCrossing,fullP,
                   (if VS == empq then noVeInNTLane else veInNTLane fi),
                   NT) (lane[L]: VS) (v[VI]: Through,crossed) OCs} 
-        if L == Nothrough /\ (B2 == fullP or B2 == semiP) . ---> B2 always is either full-p or semi-p because of noFair
+        if L == Nothrough /\ (B2 == fullP or B2 == semiP) . 
 
 ***(
     FAIR STATE
@@ -214,11 +212,11 @@ mod MTAS15 is
     --- Non-through lane in fair state: running -> approaching (-> stopped(just change to fair state)) -> halting or crossing
     crl [fair_N_halting] : {(gstat: nFin) (switch: noVehicleCrossing,fairT,veInNTLane,NT) (lane[L]: (VI ; VS)) (v[VI]: L,VeSt) OCs} 
                         => {(gstat: nFin) (switch: noVehicleCrossing,fairT,veInNTLane,NT) (lane[L]: (VI ; VS)) (v[VI]: L,halting) OCs} 
-                    if L == Nothrough /\ (VeSt == approaching or VeSt == stopped) . ---> merge fair_N_halting2
+                    if L == Nothrough /\ (VeSt == approaching or VeSt == stopped) .
 
     crl [fair_N_crossing] : {(gstat: nFin) (switch: noVehicleCrossing,fairN,veInNTLane,NT) (lane[L]: (VI ; VS)) (v[VI]: L,VeSt) OCs} 
                         => {(gstat: nFin) (switch: vehicleCrossing,fairN,veInNTLane,NT) (lane[L]: (VI ; VS)) (v[VI]: L,crossing) OCs} 
-                    if L == Nothrough /\ (VeSt == approaching or VeSt == stopped or VeSt == halting) . ---> merge fair_N_crossing2 + fair_N_crossing3
+                    if L == Nothrough /\ (VeSt == approaching or VeSt == stopped or VeSt == halting) .
 
     crl [fair_T_halting] : {(gstat: nFin) (switch: noVehicleCrossing,fairN,veInNTLane,NT) (lane[L]: (VI ; VS)) (v[VI]: L,approaching) OCs} 
                         => {(gstat: nFin) (switch: noVehicleCrossing,fairN,veInNTLane,NT) (lane[L]: (VI ; VS)) (v[VI]: L,halting) OCs} 
@@ -243,9 +241,7 @@ mod MTAS15 is
 endm
 
 --- no deadlock
-search [1] in MTAS15 : init =>! {OCs} .
-
-eof
+--- search [1] in MTAS15 : init =>! {OCs} .
 
 --- mutual exclusion
 --- search [1] in MTAS15 : init =>* {(v[VI]: L, crossing) (v[VI']: L, crossing) OCs} such that VI =/= VI' .
