@@ -623,7 +623,7 @@ represents an initial state of the state machine.
  \label{sect_oriproto}
 A merge point is visualized in Fig.~\ref{mergePoint_fig}, which is the intersection of two lanes: through lane and non-through lane.
 We suppose that each lane is one way direction.
-As in the Fig.~\ref{mergePoint_fig}, vehicles running on the through lane cannot go from left to right, while vehicles arriving from the non-through lane can only move to (2).
+As in Fig.~\ref{mergePoint_fig}, vehicles running on the through lane cannot go from left to right, while vehicles arriving from the non-through lane can only move to (2).
 Hereinafter, let us use a through lane vehicle (or non-through lane vehicle) to talk about a vehicle running on the through lane (or vehicle running on the non-through lane, respectively). 
 %If through lane and non-through lane meet at the road intersection, we regard the intersection as merge point. 
 Encountering the merge point, a through lane vehicle has higher priority than a vehicle arriving from the non-through lane because the traffic volume of the through lane is usually greater than that of the non-through lane. 
@@ -1003,13 +1003,13 @@ crl [approach_N] : {(gstat: nFin)
 \end{small}
 
 \noindent 
-where \verb!B1!, \verb!B2!, and \verb!B3! are Maude variables of sort \verb!Swich!, receiving the values \verb!noVehicleCrossing! or \verb!vehicleCrossing!, \verb!fullP! or \verb!semiP! or \verb!fairT! or \verb!fairN!, \verb!noVeInNTLane! or \verb!veInNTLane!, respectively.
+where \verb!B1!, \verb!B2!, and \verb!B3! are Maude variables of sort \verb!switch!, receiving the values \verb!noVehicleCrossing! or \verb!vehicleCrossing!, \verb!fullP! or \verb!semiP! or \verb!fairT! or \verb!fairN!, \verb!noVeInNTLane! or \verb!veInNTLane!, respectively.
 \verb!NT! is a Maude variable of natural numbers.
 \verb!VI! and \verb!VI'! are Maude variable of natural numbers, denoting arbitrary vehicle IDs. 
 \verb!VS! is a Maude variable of queues, possibly empty.
 \_;\_ is the constructor of queues, where an underscore \_ is
 a place holder where an argument (e.g., vehicle ID) is put. 
-The first rewrite rule says that when the through lane has a vehicle whose status is \verb!running!, the status is changed to \verb!approaching!, the vehicle is enqueue into the queue of the through lane, and the value of the last component of \verb!swich! (i.e., the number of vehicles approaching the merge point) is increment.
+The first rewrite rule says that when the through lane has a vehicle whose status is \verb!running!, the status is changed to \verb!approaching!, the vehicle is enqueue into the queue of the through lane, and the value of the last component of \verb!switch! (i.e., the number of vehicles approaching the merge point) is increment.
 %It means that \textit{(q1 ; q2) ; q3 = q1 ; (q2 ; q3)}. 
 %\verb!empq! represents the queue is empty. 
 %\verb!(numOfVeInTLane)! in the \verb!switch! means the length of queue on through lane (only count vehicle).
@@ -1223,7 +1223,7 @@ if L == Through /\
 \end{small}
 
 \noindent
-The rewrite rule says that when a through lane vehicle leaving the merge point, it is deleted from the queue of the through lane, the first component of observable component \verb!swich! is changed to \verb!noVehicleCrossing!, the last component of it is decrement (i.e., the number of through lane vehicles is decrement), and the second component of it is set to \verb!semiP! (i.e., the system state changes to fully-prioritized) if the queue becomes empty.
+The rewrite rule says that when a through lane vehicle leaving the merge point, it is deleted from the queue of the through lane, the first component of observable component \verb!switch! is changed to \verb!noVehicleCrossing!, the last component of it is decrement (i.e., the number of through lane vehicles is decrement), and the second component of it is set to \verb!semiP! (i.e., the system state changes to fully-prioritized) if the queue becomes empty.
 
 The following rewrite rule specifies a set of transitions when a non-through lane vehicle leaving the merge point:
 
@@ -1244,7 +1244,7 @@ if L == Nothrough /\
 \end{small}
 
 \noindent
-The rewrite rule says that when a non-through lane vehicle leaving the merge point, it is deleted from the queue of the non-through lane, the first component of observable component \verb!swich! is changed to \verb!noVehicleCrossing!, the second component of it is set to \verb!semiP! (i.e., the system state changes to fully-prioritized), and the third component of it is set to \verb!noVeInNTLane! (i.e., there is not any vehicle on the non-through lane) if the queue becomes empty.
+The rewrite rule says that when a non-through lane vehicle leaving the merge point, it is deleted from the queue of the non-through lane, the first component of observable component \verb!switch! is changed to \verb!noVehicleCrossing!, the second component of it is set to \verb!semiP! (i.e., the system state changes to fully-prioritized), and the third component of it is set to \verb!noVeInNTLane! (i.e., there is not any vehicle on the non-through lane) if the queue becomes empty.
 
 %\noindent Rule \verb![T_leave1]! shows vehicle on through lane leaving in fully-prioritized state and semi-prioritized state while rule \verb![N_leave2]! shows non-through lane.
 %\noindent Rule \verb![T_leave1]! can be applied for the vehicle on through lane leaving in fully-prioritized state and semi-prioritized state; while rule \verb![N_leave2]! for the vehicle on non-through lane as shown in Fig.~\ref{fully_fig} (e) and (f).
