@@ -11,172 +11,172 @@ fmod SMODE is
 endfm
 
 fmod QUEUE{D :: TRIV} is
-    sort Queue{D} .
-    subsort D$Elt < Queue{D} .
-    op empq : -> Queue{D} [ctor] .
-    op _;_ : Queue{D} Queue{D} -> Queue{D} [ctor assoc id: empq] .
+  sort Queue{D} .
+  subsort D$Elt < Queue{D} .
+  op empq : -> Queue{D} [ctor] .
+  op _;_ : Queue{D} Queue{D} -> Queue{D} [ctor assoc id: empq] .
 endfm
 
 fmod SOUP{D :: TRIV} is
-    sort Soup{D} .
-    subsort D$Elt < Soup{D} .
-    op empty : -> Soup{D} [ctor] .
-    op __ : Soup{D} Soup{D} -> Soup{D} [ctor assoc comm id: empty] .
-    op _\in_ : D$Elt Soup{D} -> Bool .
-    var E : D$Elt .
-    var S : Soup{D} .
-    eq E \in empty = false .
-    eq E \in E S = true .
-    eq E \in S = false [owise] .
+  sort Soup{D} .
+  subsort D$Elt < Soup{D} .
+  op empty : -> Soup{D} [ctor] .
+  op __ : Soup{D} Soup{D} -> Soup{D} [ctor assoc comm id: empty] .
+  op _\in_ : D$Elt Soup{D} -> Bool .
+  var E : D$Elt .
+  var S : Soup{D} .
+  eq E \in empty = false .
+  eq E \in E S = true .
+  eq E \in S = false [owise] .
 endfm
 
 fmod GSTATUS is
-    sort GStat .
-    ops nFin fin : -> GStat [ctor] .
+  sort GStat .
+  ops nFin fin : -> GStat [ctor] .
 endfm
 
 fmod LANE is
-    sort Lane .
-    op !_ : Lane -> Lane .
-    ops Through Nothrough : -> Lane .
-    eq !(Through) = Through .
-    eq !(Nothrough) = Through .
+  sort Lane .
+  op !_ : Lane -> Lane .
+  ops Through Nothrough : -> Lane .
+  eq !(Through) = Through .
+  eq !(Nothrough) = Through .
 endfm
 
 fmod VSTATUS is
-    pr LANE .
-    sorts VStat .
-    ops empty running approaching space yield stopped crossing crossed : -> VStat [ctor] .
+  pr LANE .
+  sorts VStat .
+  ops empty running approaching space yield stopped crossing crossed : -> VStat [ctor] .
 endfm
 
 fmod OCOMP is
-    pr GSTATUS .
-    pr VSTATUS .
-    pr NAT .
-    pr QUEUE{Nat} .
-    pr SMODE .
-    sort OComp .
-    op (gstat:_) : GStat -> OComp [ctor] .
-    op (v[_]:_,_) : Nat Lane VStat -> OComp [ctor] .
-    op (lane[_]:_) : Lane Queue{Nat} -> OComp [ctor] .
+  pr GSTATUS .
+  pr VSTATUS .
+  pr NAT .
+  pr QUEUE{Nat} .
+  pr SMODE .
+  sort OComp .
+  op (gstat:_) : GStat -> OComp [ctor] .
+  op (v[_]:_,_) : Nat Lane VStat -> OComp [ctor] .
+  op (lane[_]:_) : Lane Queue{Nat} -> OComp [ctor] .
 
-    op (vehicleCrossing:_) : Bool -> OComp [ctor] . --- is there a vehicle crossing the merge point or not
-    op (mode:_) : SMode -> OComp [ctor] . --- system mode: {fullP, semiP, fairT, fairN}
-    op (veInNTLane:_) : Bool -> OComp [ctor] . --- is there a vehicle on the non-through lane or not
-    op (numVeInTLane:_) : Nat -> OComp [ctor] . --- total number of vehicles approaching the through lane
+  op (vehicleCrossing:_) : Bool -> OComp [ctor] . --- is there a vehicle crossing the merge point or not
+  op (mode:_) : SMode -> OComp [ctor] . --- system mode: {fullP, semiP, fairT, fairN}
+  op (veInNTLane:_) : Bool -> OComp [ctor] . --- is there a vehicle on the non-through lane or not
+  op (numVeInTLane:_) : Nat -> OComp [ctor] . --- total number of vehicles approaching the through lane
 endfm
 
 view OComp from TRIV to OCOMP is
-    sort Elt to OComp .
+  sort Elt to OComp .
 endv
 
 fmod OCOMP-SOUP is
-    pr SOUP{OComp} .
-    op fin? : Soup{OComp} -> Bool .
-    op letCross : Nat Soup{OComp} -> Soup{OComp} .
-    var GS : GStat .
-    var L : Lane .
-    var N : Nat .
-    var VI : Nat .
-    var B1 B2 B3 B4 B5 : Bool .
-    var Q : Queue{Nat} .
-    var OCs : Soup{OComp} .
-    var M : SMode .
-    eq fin?(empty) = true .
-    eq fin?((gstat: GS) OCs) = fin?(OCs) .
-    eq fin?((vehicleCrossing: B1) OCs) = fin?(OCs) .
-    eq fin?((mode: M) OCs) = fin?(OCs) .
-    eq fin?((veInNTLane: B1) OCs) = fin?(OCs) .
-    eq fin?((numVeInTLane: N) OCs) = fin?(OCs) .
-    eq fin?((lane[L]: Q) OCs) = fin?(OCs) .
-    eq fin?((v[VI]: L,crossed) OCs) = fin?(OCs) .
-    eq fin?((v[VI]: L,space) OCs) = fin?(OCs) .
-    eq fin?((v[VI]: L,yield) OCs) = fin?(OCs) .
-    eq fin?(OCs) = false [owise] .
+  pr SOUP{OComp} .
+  op fin? : Soup{OComp} -> Bool .
+  op letCross : Nat Soup{OComp} -> Soup{OComp} .
+  var GS : GStat .
+  var L : Lane .
+  var N : Nat .
+  var VI : Nat .
+  var B1 B2 B3 B4 B5 : Bool .
+  var Q : Queue{Nat} .
+  var OCs : Soup{OComp} .
+  var M : SMode .
+  eq fin?(empty) = true .
+  eq fin?((gstat: GS) OCs) = fin?(OCs) .
+  eq fin?((vehicleCrossing: B1) OCs) = fin?(OCs) .
+  eq fin?((mode: M) OCs) = fin?(OCs) .
+  eq fin?((veInNTLane: B1) OCs) = fin?(OCs) .
+  eq fin?((numVeInTLane: N) OCs) = fin?(OCs) .
+  eq fin?((lane[L]: Q) OCs) = fin?(OCs) .
+  eq fin?((v[VI]: L,crossed) OCs) = fin?(OCs) .
+  eq fin?((v[VI]: L,space) OCs) = fin?(OCs) .
+  eq fin?((v[VI]: L,yield) OCs) = fin?(OCs) .
+  eq fin?(OCs) = false [owise] .
 endfm
 
 fmod CONFIG is
-    pr OCOMP-SOUP .
-    sorts Config .
-    op {_} : Soup{OComp} -> Config [ctor] .
-    ops init init2 : -> Config .
-    eq init = {(gstat: nFin) (lane[Through]: empq) (lane[Nothrough]: empq) 
-                (v[1]: Through,space) (v[2]: Through,space) (v[3]: Nothrough,space)
-                (v[4]: Through,running) (v[5]: Through,running) (v[6]: Through,running) (v[10]: Through,running)
-                (v[7]: Nothrough,running) (v[8]: Nothrough,running) (v[9]: Nothrough,running)
-                (vehicleCrossing: false) (mode: fullP) (veInNTLane: false) (numVeInTLane: 0)
-                } .
+  pr OCOMP-SOUP .
+  sorts Config .
+  op {_} : Soup{OComp} -> Config [ctor] .
+  ops init init2 : -> Config .
+  eq init = {(gstat: nFin) (lane[Through]: empq) (lane[Nothrough]: empq) 
+              (v[1]: Through,space) (v[2]: Through,space) (v[3]: Nothrough,space)
+              (v[4]: Through,running) (v[5]: Through,running) (v[6]: Through,running) (v[10]: Through,running)
+              (v[7]: Nothrough,running) (v[8]: Nothrough,running) (v[9]: Nothrough,running)
+              (vehicleCrossing: false) (mode: fullP) (veInNTLane: false) (numVeInTLane: 0)
+              } .
 endfm
 
 mod MTAS15 is
-    inc CONFIG .
-    vars L LN LT : Lane .
-    vars VI VI' NT : Nat .
-    vars VS VS' : Queue{Nat} .
-    vars OCs OCs' : Soup{OComp} .
-    vars B1 B2 B3 B4 B5 : Bool .
-    vars M M2 : SMode .
-    vars VeSt : VStat .
+  inc CONFIG .
+  vars L LN LT : Lane .
+  vars VI VI' NT : Nat .
+  vars VS VS' : Queue{Nat} .
+  vars OCs OCs' : Soup{OComp} .
+  vars B1 B2 B3 B4 B5 : Bool .
+  vars M M2 : SMode .
+  vars VeSt : VStat .
 
-    rl [loop] : {(gstat: fin) OCs} => {(gstat: fin) OCs} .  
-    crl [fin] : {(gstat: nFin) OCs} => {(gstat: fin) OCs} if fin?(OCs) .
+  rl [loop] : {(gstat: fin) OCs} => {(gstat: fin) OCs} .  
+  crl [fin] : {(gstat: nFin) OCs} => {(gstat: fin) OCs} if fin?(OCs) .
 
-    --- approaching
-    crl [approach_T] : 
-      {(gstat: nFin) (mode: M) (veInNTLane: B3) (numVeInTLane: NT) (lane[L]: VS) (v[VI]: L,running) OCs} 
-    => {(gstat: nFin) (mode: (if NT >= 3 and B3 then fairT else M fi))
-        (veInNTLane: B3) (numVeInTLane: (NT + 1)) (lane[L]: (VS ; VI)) (v[VI]: L,approaching) OCs} 
-    if L == Through .
+  --- approaching
+  crl [approach_T] : 
+    {(gstat: nFin) (mode: M) (veInNTLane: B3) (numVeInTLane: NT) (lane[L]: VS) (v[VI]: L,running) OCs} 
+  => {(gstat: nFin) (mode: (if NT >= 3 and B3 then fairT else M fi))
+      (veInNTLane: B3) (numVeInTLane: (NT + 1)) (lane[L]: (VS ; VI)) (v[VI]: L,approaching) OCs} 
+  if L == Through .
 
-    crl [approach_N] : 
-      {(gstat: nFin) (veInNTLane: B3) (lane[L]: VS) (v[VI]: L,running) OCs} 
-    => {(gstat: nFin) (veInNTLane: true) (lane[L]: (VS ; VI)) (v[VI]: L,approaching) OCs} 
-    if L == Nothrough .
+  crl [approach_N] : 
+    {(gstat: nFin) (veInNTLane: B3) (lane[L]: VS) (v[VI]: L,running) OCs} 
+  => {(gstat: nFin) (veInNTLane: true) (lane[L]: (VS ; VI)) (v[VI]: L,approaching) OCs} 
+  if L == Nothrough .
     
 ***(
     FULLY-PRIORITIZED STATE
     Through-lane vehicle enter the merge point without stopped status.
 )***
-    crl [full_T_crossing] : 
-      {(gstat: nFin) (vehicleCrossing: false) (mode: fullP) (lane[L]: (VI ; VS)) (v[VI]: L,approaching) OCs} 
-    => {(gstat: nFin) (vehicleCrossing: true) (mode: fullP) (lane[L]: (VI ; VS)) (v[VI]: L,crossing) OCs} 
-    if L == Through .
+  crl [full_T_crossing] : 
+    {(gstat: nFin) (vehicleCrossing: false) (mode: fullP) (lane[L]: (VI ; VS)) (v[VI]: L,VeSt) OCs} 
+  => {(gstat: nFin) (vehicleCrossing: true) (mode: fullP) (lane[L]: (VI ; VS)) (v[VI]: L,crossing) OCs} 
+  if L == Through /\ (VeSt == approaching or VeSt == stopped) .
 
-    crl [full_N_crossing] : 
-      {(gstat: nFin) (vehicleCrossing: false) (mode: fullP) (numVeInTLane: 0) (lane[L]: (VI ; VS)) (v[VI]: L,approaching) OCs} 
-    => {(gstat: nFin) (vehicleCrossing: true) (mode: fullP) (numVeInTLane: 0) (lane[L]: (VI ; VS)) (v[VI]: L,crossing) OCs}
-    if L == Nothrough .
+  crl [full_N_crossing] : 
+    {(gstat: nFin) (vehicleCrossing: false) (mode: fullP) (numVeInTLane: 0) (lane[L]: (VI ; VS)) (v[VI]: L,VeSt) OCs} 
+  => {(gstat: nFin) (vehicleCrossing: true) (mode: fullP) (numVeInTLane: 0) (lane[L]: (VI ; VS)) (v[VI]: L,crossing) OCs}
+  if L == Nothrough /\ (VeSt == approaching or VeSt == stopped) .
 
 ***(
     SEMI-PRIORITIZED STATE
     if there is a space in Though lane, Nothrough-lane vehicle can enter the merge point.
     one space, one vehicle.
 )***
-    crl [semi1] : 
-      {(gstat: nFin) (vehicleCrossing: false) (mode: M) (veInNTLane: true)
-        (lane[Through]: (VI ; VS)) (v[VI]: Through,space) 
-        (lane[Nothrough]: (VI' ; VS')) (v[VI']: Nothrough,approaching) OCs} 
-    => {(gstat: nFin) (vehicleCrossing: true) (mode: semiP) (veInNTLane: true)
-        (lane[Through]: VS) (v[VI]: Through,yield) 
-        (lane[Nothrough]: (VI' ; VS')) (v[VI']: Nothrough,crossing) OCs}
-    if (M == fullP or M == semiP) .
+  crl [semi] : 
+    {(gstat: nFin) (vehicleCrossing: false) (mode: M) (veInNTLane: true)
+      (lane[Through]: (VI ; VS)) (v[VI]: Through,space) 
+      (lane[Nothrough]: (VI' ; VS')) (v[VI']: Nothrough,approaching) OCs} 
+  => {(gstat: nFin) (vehicleCrossing: true) (mode: semiP) (veInNTLane: true)
+      (lane[Through]: VS) (v[VI]: Through,yield) 
+      (lane[Nothrough]: (VI' ; VS')) (v[VI']: Nothrough,crossing) OCs}
+  if (M == fullP or M == semiP) .
 
 ***(
     PRIORITIZED STATE
     SEMI-PRIORITIZED STATE
     LEAVE
 )***
-    crl [T_leave] : 
-      {(gstat: nFin) (vehicleCrossing: true) (mode: M) (numVeInTLane: NT) (lane[L]: (VI ; VS)) (v[VI]: L,crossing) OCs} 
-    => {(gstat: nFin) (vehicleCrossing: false) (mode: (if (VS == empq or NT <= 3) then fullP else M fi))
-        (numVeInTLane: sd(NT,1)) (lane[L]: VS) (v[VI]: L,crossed) OCs} 
-    if L == Through /\ (M == fullP or M == semiP) .
+  crl [T_leave] : 
+    {(gstat: nFin) (vehicleCrossing: true) (mode: M) (numVeInTLane: NT) (lane[L]: (VI ; VS)) (v[VI]: L,crossing) OCs} 
+  => {(gstat: nFin) (vehicleCrossing: false) (mode: (if (VS == empq or NT <= 3) then fullP else M fi))
+      (numVeInTLane: sd(NT,1)) (lane[L]: VS) (v[VI]: L,crossed) OCs} 
+  if L == Through /\ (M == fullP or M == semiP) .
 
-    crl [N_leave] : 
-      {(gstat: nFin) (vehicleCrossing: true) (mode: M) (veInNTLane: true) (lane[L]: (VI ; VS)) (v[VI]: L,crossing) OCs} 
-    => {(gstat: nFin) (vehicleCrossing: false) (mode: fullP)
-        (veInNTLane: (if VS == empq then false else true fi)) (lane[L]: VS) (v[VI]: Through,crossed) OCs} 
-    if L == Nothrough /\ (M == fullP or M == semiP) . 
+  crl [N_leave] : 
+    {(gstat: nFin) (vehicleCrossing: true) (mode: M) (veInNTLane: true) (lane[L]: (VI ; VS)) (v[VI]: L,crossing) OCs} 
+  => {(gstat: nFin) (vehicleCrossing: false) (mode: fullP)
+      (veInNTLane: (if VS == empq then false else true fi)) (lane[L]: VS) (v[VI]: Through,crossed) OCs} 
+  if L == Nothrough /\ (M == fullP or M == semiP) . 
 
 ***(
     FAIR STATE
@@ -184,47 +184,57 @@ mod MTAS15 is
     in fair state, Nothrough-lane vehicle and Through-lane vehicle enter the merge point alternatively.
     Use B2 to control the order.
 )***
+  crl [fair_T_crossing] : 
+    {(gstat: nFin) (vehicleCrossing: false) (mode: fairT) (lane[L]: (VI ; VS)) (v[VI]: L,VeSt) OCs} 
+  => {(gstat: nFin) (vehicleCrossing: true) (mode: fairT) (lane[L]: (VI ; VS)) (v[VI]: L,crossing) OCs} 
+  if L == Through /\ (VeSt == approaching or VeSt == stopped) .
 
-    crl [fair_T_crossing] : 
-      {(gstat: nFin) (vehicleCrossing: false) (mode: fairT) (lane[L]: (VI ; VS)) (v[VI]: L,approaching) OCs} 
-    => {(gstat: nFin) (vehicleCrossing: true) (mode: fairT) (lane[L]: (VI ; VS)) (v[VI]: L,crossing) OCs} 
-    if L == Through .
+  crl [fair_N_crossing] : 
+    {(gstat: nFin) (vehicleCrossing: false) (mode: fairN) (veInNTLane: true) (lane[L]: (VI ; VS)) (v[VI]: L,VeSt) OCs} 
+  => {(gstat: nFin) (vehicleCrossing: true) (mode: fairN) (veInNTLane: true) (lane[L]: (VI ; VS)) (v[VI]: L,crossing) OCs} 
+  if L == Nothrough /\ (VeSt == approaching or VeSt == stopped) .
 
-    crl [fair_N_crossing] : 
-      {(gstat: nFin) (vehicleCrossing: false) (mode: fairN) (veInNTLane: true) (lane[L]: (VI ; VS)) (v[VI]: L,approaching) OCs} 
-    => {(gstat: nFin) (vehicleCrossing: true) (mode: fairN) (veInNTLane: true) (lane[L]: (VI ; VS)) (v[VI]: L,crossing) OCs} 
-    if L == Nothrough .
+  crl [fair_T_crossed] : 
+    {(gstat: nFin) (vehicleCrossing: true) (mode: fairT) (veInNTLane: B3) (numVeInTLane: NT) (lane[L]: (VI ; VS)) (v[VI]: L,crossing) OCs} 
+  => {(gstat: nFin) (vehicleCrossing: false)
+      (mode: (if (VS == empq or B3 == false) then fullP else fairN fi))
+      (veInNTLane: B3) (numVeInTLane: sd(NT,1)) (lane[L]: VS) (v[VI]: L,crossed) OCs} 
+  if L == Through .
 
-    crl [fair_T_crossed] : 
-      {(gstat: nFin) (vehicleCrossing: true) (mode: fairT) (veInNTLane: B3) (numVeInTLane: NT) (lane[L]: (VI ; VS)) (v[VI]: L,crossing) OCs} 
-    => {(gstat: nFin) (vehicleCrossing: false)
-        (mode: (if (VS == empq or B3 == false) then fullP else fairN fi))
-        (veInNTLane: B3) (numVeInTLane: sd(NT,1)) (lane[L]: VS) (v[VI]: L,crossed) OCs} 
-    if L == Through .
-
-    crl [fair_N_crossed] : 
-      {(gstat: nFin) (vehicleCrossing: true) (mode: fairN) (veInNTLane: B3) (lane[L]: (VI ; VS)) (v[VI]: L,crossing) OCs} 
-    => {(gstat: nFin) (vehicleCrossing: false)
-        (mode: (if VS == empq then fullP else fairT fi)) 
-        (veInNTLane: (if VS == empq then false else B3 fi))
-        (lane[L]: VS) (v[VI]: L,crossed) OCs}
-    if L == Nothrough .
+  crl [fair_N_crossed] : 
+    {(gstat: nFin) (vehicleCrossing: true) (mode: fairN) (veInNTLane: B3) (lane[L]: (VI ; VS)) (v[VI]: L,crossing) OCs} 
+  => {(gstat: nFin) (vehicleCrossing: false)
+      (mode: (if VS == empq then fullP else fairT fi)) 
+      (veInNTLane: (if VS == empq then false else B3 fi))
+      (lane[L]: VS) (v[VI]: L,crossed) OCs}
+  if L == Nothrough .
 
 --- the system changes to fair mode after the vehicle (on non-through lane) enter the merge point
-    crl [N_leave2] : 
-      {(gstat: nFin) (vehicleCrossing: true) (mode: fairT) (veInNTLane: true) (lane[L]: (VI ; VS)) (v[VI]: L,crossing) OCs} 
-    => {(gstat: nFin) (vehicleCrossing: false) (mode: fairT) 
-        (veInNTLane: (if VS == empq then false else true fi))
-        (lane[L]: VS) (v[VI]: L,crossed) OCs} 
-    if L == Nothrough . 
+  crl [N_leave2] : 
+    {(gstat: nFin) (vehicleCrossing: true) (mode: fairT) (veInNTLane: true) (lane[L]: (VI ; VS)) (v[VI]: L,crossing) OCs} 
+  => {(gstat: nFin) (vehicleCrossing: false) (mode: fairT) 
+      (veInNTLane: (if VS == empq then false else true fi))
+      (lane[L]: VS) (v[VI]: L,crossed) OCs} 
+  if L == Nothrough . 
+
+  crl [fair_T_stop] : 
+    {(gstat: nFin) (mode: fairN) (lane[L]: (VI ; VS)) (v[VI]: L,approaching) OCs} 
+  => {(gstat: nFin) (mode: fairN) (lane[L]: (VI ; VS)) (v[VI]: L,stopped) OCs} 
+  if L == Through .
+
+  crl [fair_N_stop] : 
+    {(gstat: nFin) (mode: fairT) (lane[L]: (VI ; VS)) (v[VI]: L,approaching) OCs} 
+  => {(gstat: nFin) (mode: fairT) (lane[L]: (VI ; VS)) (v[VI]: L,stopped) OCs} 
+  if L == Nothrough .
+
 endm
 
 --- no deadlock
---- search [1] in MTAS15 : init =>! {OCs} .
+search [1] in MTAS15 : init =>! {OCs} .
 
 --- mutual exclusion
---- search [1] in MTAS15 : init =>* {(v[VI]: L, crossing) (v[VI']: L, crossing) OCs} such that VI =/= VI' .
-eof
+search [1] in MTAS15 : init =>* {(v[VI]: L, crossing) (v[VI']: L, crossing) OCs} such that VI =/= VI' .
+--- eof
 
 in model-checker .
 
@@ -259,7 +269,7 @@ mod MTAS15-CHECK is
   vars VI : Nat .
   eq lofree0(VI) = (want(VI) |-> passed(VI)) .
   eq lofree = lofree0(4) /\ lofree0(5) /\ lofree0(6) /\
-              lofree0(7) /\ lofree0(8) /\ lofree0(9).
+              lofree0(7) /\ lofree0(8) /\ lofree0(9) /\ lofree0(10) .
 endm
 
 red in MTAS15-CHECK : modelCheck(init,lofree) .
