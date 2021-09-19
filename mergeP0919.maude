@@ -124,7 +124,7 @@ mod MTAS15 is
   --- approaching
   crl [approach_T] : 
     {(gstat: nFin) (mode: M) (veInNTLane: B3) (numVeInTLane: NT) (lane[L]: VS) (v[VI]: L,running) OCs} 
-  => {(gstat: nFin) (mode: (if NT >= 3 and B3 then fairT else M fi))
+  => {(gstat: nFin) (mode: (if NT >= 2 and B3 then fairT else M fi))
       (veInNTLane: B3) (numVeInTLane: (NT + 1)) (lane[L]: (VS ; VI)) (v[VI]: L,approaching) OCs} 
   if L == Through .
 
