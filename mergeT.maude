@@ -235,7 +235,7 @@ mod MTAS15 is
 endm
 
 --- no deadlock
---- search [1] in MTAS15 : init =>! {OCs} .
+search [1] in MTAS15 : init =>! {OCs} .
 
 --- mutual exclusion
 search [1] in MTAS15 : init =>* {(v[VI]: L, crossing) (v[VI']: LN, crossing) OCs} such that VI =/= VI' .
