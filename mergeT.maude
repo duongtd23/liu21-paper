@@ -110,7 +110,7 @@ fmod CONFIG is
   op {_} : Soup{OComp} -> Config [ctor] .
   ops init init2 : -> Config .
   eq init = {(gstat: nFin) (lane[through]: empq) (lane[noThrough]: empq) 
-              (v[101]: through,unspace) (v[102]: through,unspace) (v[103]: through,unspace)
+              (v[101]: through,unspace) (v[102]: through,unspace)
               (v[4]: through,running) (v[5]: through,running) (v[6]: through,running) (v[7]: through,running)
               (v[1]: noThrough,running) (v[2]: noThrough,running) (v[3]: noThrough,running) 
               (vehicleCrossing: false) (mode: prioritized)

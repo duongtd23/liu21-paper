@@ -441,7 +441,7 @@ Email: \{liuminxuan,bddang,duongtd,ogata\}@jaist.ac.jp}
 Self-driving/autonomous vehicles are promising transportation of the
 future providing many conveniences for people.  Because safety is a
 point of paramount significance for any autonomous vehicle system, a
-large number of researches have proposed mechanisms/protocols to
+large number of researchers have proposed mechanisms/protocols to
 automatically control vehicles running on public roads without any
 collision. S. Aoki and R. Rajkumar proposed a merging protocol for
 autonomous vehicles. The protocol controls autonomous vehicles running
@@ -450,7 +450,7 @@ that such vehicles pass through the merge point without any
 collision. The protocol uses real-time information, such as the
 average speed of multiple vehicles running on a lane. We have revised
 the protocol such that it never uses such information because the
-seepf of a vehicle may drastically change in a short moment. We have
+sleep of a vehicle may drastically change in a short moment. We have
 then formally specified the revised version of the protocol in Maude
 and conducted some model checking experiments with Maude that the
 revised version enjoys some desired properties.
@@ -498,13 +498,13 @@ without any collision. In the protocol, autonomous vehicles are
 assumed to use both vehicle-to-vehicle (V2V) communications and
 sensor-based perception systems.  According to the paper, the authors
 claim that the protocol is safe and efficient. The protocol is called
-the Aoki-Rajkumar merging ptotocol or simply the AR merging protocol.
+the Aoki-Rajkumar merging protocol or simply the AR merging protocol.
 
 The AR merging protocol relies on real-time information, such as the
 average speed of multiple vehicles running on a lane. We think that
 such information is fragile because the speeds of vehicles may
 drastically change in a short moment, say by sudden
-breaking. Therefore, we would like not to rely on such information. We
+braking. Therefore, we would like not to rely on such information. We
 have then revised the AR merging protocol. The revised version of the
 AR merging protocol is called our merging protocol in the present
 paper. We have also formally specified our merging protocol in
@@ -657,9 +657,9 @@ represents an initial state of the state machine.
 
 A merge point is visualized in Fig.~\ref{mergePoint_fig}, which is the
 intersection of two lanes: one through lane (3) and one non-through
-lane (1).  We suppose that each lane is one-way direction.  The
+lane (1).  We suppose that each lane is in a one-way direction.  The
 directions are shown as in Fig.~\ref{mergePoint_fig}. A vehicle
-running on each lane goes though the merge point, moving to (2) in
+running on each lane goes through the merge point, moving to (2) in
 Fig.~\ref{mergePoint_fig}. Hereinafter, let us use through lane
 vehicles and non-through lane vehicles to talk about vehicles running
 on the through lane and vehicles running on the non-through lane,
@@ -688,13 +688,13 @@ versions that correspond to two traffic environments: (1) only
 autonomous vehicles on the traffic (homogeneous traffic) and (2)
 autonomous vehicles and human-driven vehicles on the traffic
 (heterogeneous traffic).  In the present paper, we only concentrate on
-the first version (1) that is called the Aoki-Rajkumar merging
+the first version (1) which is called the Aoki-Rajkumar merging
 protocol or simply the AR merging protocol.  The protocol requires
 each vehicle to be equipped with software systems, such as a
-navigation system and hardware devices, such as sensors.  Furthermore,
-the authors also assume that each vehicle is able to uses some
-technologies, such as WAVE \cite{4346439,5888501} and GPS, to
-communication with other vehicles.
+navigation system with hardware devices, such as sensors.  Furthermore,
+the authors also assume that each vehicle is able to use some
+technologies, such as WAVE \cite{4346439,5888501}, and GPS, to
+communicate with other vehicles.
 
 All vehicles participating in the protocol are controlled based on two
 system modes: prioritized mode and fair mode.  When the system is in
@@ -711,7 +711,7 @@ is approaching the merge point.  There are basically two cases:
 
 \begin{itemize}
 \item if there are some through lane vehicles that are approaching the
-  merge point and there is no enough space between any of two adjacent
+  merge point and there is not enough space between any of two adjacent
   such vehicles, non-through lane vehicles must stop before the merge
   point until all such through lane vehicles have passed through the
   merge point;
@@ -921,7 +921,7 @@ through lane vehicle $\omega_{h1}$.
 \section{A Revised Version of the Protocol}
  \label{sect_reviproto}
 
-We revise the AR merging protocol such that it does not rely any
+We revise the AR merging protocol such that it does not rely on any
 real-time information, such as the average speed of multiple vehicles
 running on a lane. Or we can say that we design a new merging protocol
 that does not rely on such information based on the AR merging
@@ -940,13 +940,13 @@ its status is stopped. When a vehicle enters the
 merge point, its status changes to crossing from approaching or stopped. 
 When a vehicle has passed through the merge point, its
 status changes to crossed from crossing. We suppose that vehicles
-whose statuses are approaching, stopped or halting on one lane never
+whose statuses are approaching, or stopped on one lane never
 pass over any other vehicles. We use a boolean variable to check whether
 the vehicle is in the merge point or not. To this end, we need to use V2V
 communications. Such vehicles can be regarded as making a virtual
-queue of vehicles. As the AR merging proocol, there are two modes
+queue of vehicles. As the AR merging protocol, there are two modes
 (prioritized mode and fair mode) in our protocol. Initially,
-we suppose that the system is in prioritized mode, boolean variable is false
+we suppose that the system is in prioritized mode, the boolean variable is false
 and each vehicle is in running.
 
 In our protocol, there are three cases in which a non-through lane
@@ -961,7 +961,7 @@ traffic of the through lane is congested (fair mode).
 \begin{center}
 \scalebox{0.36}{\includegraphics{Pictures/throughLane.pdf}}
 \end{center}
-\caption{Change of the status of a through lane vehicle}
+\caption{Transition of a through lane vehicle's status}
 \label{throughLaneStatus}
 \end{figure}
 
@@ -994,14 +994,15 @@ greater then a specific number. Otherwise, the system is in prioritized mode.
 Note that the through lane vehicles that constitute the virtual queue on the
 through lane are in approaching or stopped or crossing.
 It refers that only the through lane vehicles that constitute the virtual queue
-on the through lane can affect the system. 
+on the through lane can affect the system. Furhtermore, we also define two turns 
+for through and non-through lane vehicle in the fair mode.
 
-Fig.~\ref{space} visualizes two cases that a non-through lane vehicles can enter
-the merge point when the top of through lane is a space.
+Fig.~\ref{space} visualizes two cases that a non-through lane vehicle can enter
+the merge point when the top of the through lane is a space.
 The blue circle
 represents the non-through lane vehicle, the red circle represents the
-through lane vehicles, and the white circle represents a space.  Green
-area denotes the merge point. Each vehicle or space is attached a
+through lane vehicles, and the white circle represents a space. The green
+area denotes the merge point. Each vehicle or space is attached to a
 different number.
 A non-through lane vehicle whose status is approaching or stopped on the top through lane
 can enter the merge point even the system is in prioritized or fair mode.
@@ -1041,62 +1042,62 @@ satisfied.  Each condition (or trigger event) is:
   \item[h)] The system is in fair mode. 
 \end{itemize}
 
-Note that the non-through lane vehicles do not affect the mode of system even
+Note that the non-through lane vehicles do not affect the mode of the system even
 some vehicle is in the merge point.
-The details of all conditions will be mentioned in the following seciton.
+The details of all conditions will be mentioned in the following section.
 
  
 \section{Formal Specification}
  \label{sect_formal}
- We use two queues to maintain the vehicles running on the through lane and non-through lane, respectively.
- In the through lane, the element in the queue can be not only a vehicle, but also a space.
- In this paper, a state is expressed as a soup of observable components.
- To formalize the protocol, we use four observable components as follows:
- \begin{itemize}
-    \item (\verb!v[!$id$\verb!]:!$position$\verb!,!$vstat$) - $id$ is an ID (a nature number) of 
-    a vehicle or a space (we assume that if the ID is less than 100, it is a vehicle, otherwise it is a space), 
-    $position$ is the lane that the vehicle, or the space $id$ is located 
-    (only on through lane), $vstate$ is the status of the vehicle if it is a 
-    vehicle. Initially, $vstate$ is \verb!unspace! if it is a space, or \verb!running! if it is a vehicle.
-    \item (\verb!lane[!$position$\verb!]:!$q$) - $position$ is the through lane or 
-    non-through lane, and $q$ is a queue of vehicles and spaces (only on through lane). 
-    Initially, $q$ is \verb!empq!, which denotes an empty queue.
-     
-    \item (\verb!vehicleCrossing:!$b1$) - $b1$ is either true or false, indicating that there 
-    exists a vehicle crossing the merge point or there does not, respectively. Initially, $b1$ is false.
-   
-    \item (\verb!mode:!$smode$) - $smode$ receives one of the following three values: 
-   \verb!prioritized! indicating that the system is in prioritized mode, 
-   \verb!fairT! indicating that the system is in fair mode and it is the through lane vehicle's turn,
-   \verb!fairN! indicating that the system is in fair mode and it is the non-through lane vehicle's turn.
+We use two queues to maintain the vehicles running on the through lane and non-through lane, respectively.
+In the through lane, the element in the queue can be not only a vehicle but also a space.
+In this paper, a state is expressed as a soup of observable components.
+To formalize the protocol, we use four observable components as follows:
+\begin{itemize}
+  \item (\verb!v[!$id$\verb!]:!$position$\verb!,!$vstat$) - $id$ is an ID (a nature number) of 
+  a vehicle or a space (we assume that if the ID is less than 100, it is a vehicle, otherwise it is a space), 
+  $position$ is the lane that the vehicle, or the space $id$ is located 
+  (only on through lane), $vstate$ is the status of the vehicle if it is a 
+  vehicle. Initially, $vstate$ is \verb!unspace! if it is a space, or \verb!running! if it is a vehicle.
+  \item (\verb!lane[!$position$\verb!]:!$q$) - $position$ is the through lane or 
+  non-through lane, and $q$ is a queue of vehicles and spaces (only on through lane). 
+  Initially, $q$ is \verb!empq!, which denotes an empty queue.
     
-   Initially, $smode$ is \verb!prioritized!.
-   
-    \item (\verb!gstat! : $gstat$) -  $gstat$ is either \verb!fin! or \verb!nFin!.
-    When it is \verb!fin!, all vehicles concerned have crossed the intersection.
- \end{itemize}
- 
- We define a function that check whether the traffic is congested as follows:
- \begin{small}
-  \begin{verbatim}
-  op #(_,_,_) : Queue Nat Nat -> Nat .
-  eq #(empq, X, Y) = X .
-  eq #(Q, X, 0) = X .
-  ceq #((Z ; Q), X, Y) = #(Q, X, sd(Y,1)) 
-                  if Z >= 100 .
-  ceq #((Z ; Q), X, Y) = #(Q, s(X), sd(Y,1)) 
-                  if Z < 100 .
-  \end{verbatim}
-  \end{small}
+  \item (\verb!vehicleCrossing:!$b1$) - $b1$ is either true or false, indicating that there 
+  exists a vehicle crossing the merge point or there does not, respectively. Initially, $b1$ is false.
+  
+  \item (\verb!mode:!$smode$) - $smode$ receives one of the following three values: 
+  \verb!prioritized! indicating that the system is in prioritized mode, 
+  \verb!fairT! indicating that the system is in fair mode and it is the through lane vehicle's turn,
+  \verb!fairN! indicating that the system is in fair mode and it is the non-through lane vehicle's turn.
+  
+  Initially, $smode$ is \verb!prioritized!.
+  
+  \item (\verb!gstat! : $gstat$) -  $gstat$ is either \verb!fin! or \verb!nFin!.
+  When it is \verb!fin!, all vehicles concerned have crossed the intersection.
+\end{itemize}
+
+We define a function that check whether the traffic is congested as follows:
+\begin{small}
+\begin{verbatim}
+op #(_,_,_) : Queue Nat Nat -> Nat .
+eq #(empq, X, Y) = X .
+eq #(Q, X, 0) = X .
+ceq #((Z ; Q), X, Y) = #(Q, X, sd(Y,1)) 
+                if Z >= 100 .
+ceq #((Z ; Q), X, Y) = #(Q, s(X), sd(Y,1)) 
+                if Z < 100 .
+\end{verbatim}
+\end{small}
 \noindent where \verb!Q!, \verb!X!, \verb!Y!, \verb!Z! are Maude variables 
 for queue and three natural numbers, respectively. \verb!sd()!, \verb!s()! are 
 Maude operations for decrementing and incrementing, respectively.
 This function returns the number of vehicles of top \verb!Y! elements of the queue
 in which \verb!Y! is set to 5 in our specificaiton. 
  
-We use 15 rewrite rules to define the transitions of the protocol.
+We use 15 rewrite rules to define the transitions of the protocol mentioned in \ref{sect_reviproto}.
 Those rewrite rules are divided into four groups: vehicles get close to the merge point,
-the vehicle stops in front of the merge point, the vehicle is in the merge point and 
+the vehicle stops before the merge point, the vehicle is in the merge point and 
 the vehicle crossed the merge point.
 
 \subsection{Vehicles approach the merge point}
@@ -1136,7 +1137,7 @@ it is prioritized. Let us repeat that only through lane vehicles affect
 to the mode so when space is put into queue, it does not change the mode.
 Those rewrite rules just change the vehicle or space status when they are put into queue.
 
-\subsection{Vehicles stop in front of the merge point}
+\subsection{Vehicles stop before the merge point}
 The following rewrite rules refer to conditions 2), 3), b), and c) in which 
 rewrite rule \verb!stopped! corresponds to 2), and b), rewrite rule 
 \verb!fair_T_stopped! corresponds to 3), and \verb!fair_N_stopped! corresponds
