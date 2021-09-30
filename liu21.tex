@@ -1006,6 +1006,7 @@ area denotes the merge point. Each vehicle or space is attached to a
 different number.
 A non-through lane vehicle whose status is approaching or stopped on the top through lane
 can enter the merge point even the system is in prioritized or fair mode.
+Let us note that space is only used in through lane.
 
 \begin{figure}[h]
 	\begin{center}
@@ -1034,7 +1035,7 @@ satisfied.  Each condition (or trigger event) is:
   \item[b)] Some vehicle is in the merge point. 
   \item[c)] The system is in fair mode and there is through lane vehicle's turn. 
   \item[d)] The system is in prioritized mode and no vehicle on through lane. The vehicle either 
-  approaching or stopped can enter the merge point
+  approaching or stopped can enter the merge point.
   \item[e)] The system is in fair mode and non-through lane vehicle's turn. The vehicle either 
   approaching or stopped can enter the merge point. 
   \item[f)] The top of through lane is space (refer to condition 2'). 
@@ -1050,21 +1051,22 @@ The details of all conditions will be mentioned in the following section.
 \section{Formal Specification}
  \label{sect_formal}
 We use two queues to maintain the vehicles running on the through lane and non-through lane, respectively.
-In the through lane, the element in the queue can be not only a vehicle but also a space.
+In the through lane, each element in the queue can be either a vehicle or a space.
 In this paper, a state is expressed as a soup of observable components.
 To formalize the protocol, we use four observable components as follows:
 \begin{itemize}
   \item (\verb!v[!$id$\verb!]:!$position$\verb!,!$vstat$) - $id$ is an ID (a nature number) of 
-  a vehicle or a space (we assume that if the ID is less than 100, it is a vehicle, otherwise it is a space), 
-  $position$ is the lane that the vehicle, or the space $id$ is located 
-  (only on through lane), $vstate$ is the status of the vehicle if it is a 
+  a vehicle or a space (we assume that if the ID is less than 100, it represents a vehicle, otherwise it 
+  represents a space), 
+  $position$ is the lane that the vehicle, or the space (only on through lane) $id$ is located, 
+  $vstate$ is the status of the vehicle if it is a 
   vehicle. Initially, $vstate$ is \verb!unspace! if it is a space, or \verb!running! if it is a vehicle.
   \item (\verb!lane[!$position$\verb!]:!$q$) - $position$ is the through lane or 
   non-through lane, and $q$ is a queue of vehicles and spaces (only on through lane). 
   Initially, $q$ is \verb!empq!, which denotes an empty queue.
     
-  \item (\verb!vehicleCrossing:!$b1$) - $b1$ is either true or false, indicating that there 
-  exists a vehicle crossing the merge point or there does not, respectively. Initially, $b1$ is false.
+  \item (\verb!vehicleCrossing:!$b$) - $b$ is either true or false, indicating that there 
+  exists a vehicle crossing the merge point or there does not, respectively. Initially, $b$ is false.
   
   \item (\verb!mode:!$smode$) - $smode$ receives one of the following three values: 
   \verb!prioritized! indicating that the system is in prioritized mode, 
@@ -1077,7 +1079,9 @@ To formalize the protocol, we use four observable components as follows:
   When it is \verb!fin!, all vehicles concerned have crossed the intersection.
 \end{itemize}
 
-We define a function that check whether the traffic is congested as follows:
+We define a function that counts the number of the through lane
+vehicles that constitute the virtual queue to check whether the 
+traffic is congested as follows:
 \begin{small}
 \begin{verbatim}
 op #(_,_,_) : Queue Nat Nat -> Nat .
@@ -1093,7 +1097,7 @@ ceq #((Z ; Q), X, Y) = #(Q, s(X), sd(Y,1))
 for queue and three natural numbers, respectively. \verb!sd()!, \verb!s()! are 
 Maude operations for decrementing and incrementing, respectively.
 This function returns the number of vehicles of top \verb!Y! elements of the queue
-in which \verb!Y! is set to 5 in our specificaiton. 
+in which \verb!Y! is set to five in our specificaiton. 
  
 We use 15 rewrite rules to define the transitions of the protocol mentioned in \ref{sect_reviproto}.
 Those rewrite rules are divided into four groups: vehicles get close to the merge point,
@@ -1135,7 +1139,7 @@ are Maude variables for mode, lane information (through or non-through), queue, 
 vehicles of top five elements in the queue, it is congested, otherwise 
 it is prioritized. Let us repeat that only through lane vehicles affect
 to the mode so when space is put into queue, it does not change the mode.
-Those rewrite rules just change the vehicle or space status when they are put into queue.
+Those rewrite rules change the status of the vehicle or space when they are put into queue.
 
 \subsection{Vehicles stop before the merge point}
 The following rewrite rules refer to conditions 2), 3), b), and c) in which 
@@ -1252,10 +1256,10 @@ rl [del_space] :
 
 Let us consider the rewrite rule \verb!N_space!, it is a case such that
 the top element of the through lane is space, then if there exists a 
-non-through lane vehicle, it can enter the merge point. Afterthat, 
-the space is taken. Note that, we update the mode because the queue
-has been modified. The rewrite rule \verb!del_space! just deletes 
-the top element of through lane and update the mode after then.
+non-through lane vehicle, it can enter the merge point. After that, 
+the space is removed. Note that, we update the mode because the queue
+on through lane has been modified. The rewrite rule \verb!del_space! deletes 
+the top element of through lane and update the mode.
 The other rewrite rules work similarly.
 
 \subsection{Vehicle crossed the merge point}
@@ -1311,15 +1315,15 @@ rl [fair_T_crossed2] :
   \end{verbatim}
 \end{small}
  
-In prioritized mode, both lane do not affect the mode so we only
+In prioritized mode (\verb!prioritized_crossed!), both lane do not affect the mode so we only
 update the vehicle's status.
-In fair mode, \verb!FairT! is set for non-through lane vehicle even 
+In fair mode (\verb!N_crossed!), \verb!FairT! is set for non-through lane vehicle even 
 it is through lane vehicle's turn or non-through lane vehicle's turn.
 Note that the non-through lane vehicle can enter the merge point in 
-through lane vehicle's turn when condition \verb!N_space! is satisfied.
+through lane vehicle's turn when condition f) or 2') is satisfied.
 
-Let us consider the rewrite rule \verb!fair_T_crossed1!, after the condition
-7) is satisfied, we check the traffic except for the vehicle in the merge point.
+Let us consider the rewrite rule \verb!fair_T_crossed1! (in case the condition
+7) is satisfied), we check the traffic except for the vehicle in the merge point.
 If it is still congested, the mode is updated to non-through lane vehicle's turn,
 otherwise, the system returns to prioritized mode. In the rewrite rule 
 \verb!fair_T_crossed2! based on condition 8), we update the \verb!mode! by checking the 
@@ -1340,7 +1344,7 @@ There are three desired properties the \textit{a-merging} protocol should enjoy:
 \end{itemize}
 
 %We need an initial state that can cover all three states in our \textit{Revised Autonomous Vehicle Protocol for Merge Points}.
-%Therefore, we put two space and three vehicles on the through lane, one space and three vehicles on the non-through lane.
+%Therefore, we put two spaces and three vehicles on the through lane, one space and three vehicles on the non-through lane.
 %To cover all situations (three states) in the \textit{a-merging} protocol, we assume that two spaces and three vehicles on the through lane, one space and three vehicles on the non-through lane.
 %The \verb!init! is shown as follows:
 
@@ -1464,7 +1468,7 @@ red in MERGING-CHECK :
 \noindent
 No counterexamples were found. 
 Consequently, we can conclude that the protocol enjoys the \textit{starvation freedom} 
-property with seven vehicles and two space participating in the protocol.
+property with seven vehicles and two spaces participating in the protocol.
  
 \section{Related Work}
  \label{sect_Relate}
@@ -1512,9 +1516,9 @@ formally specified and conducted some experiments by model checking in Maude.
 Three properities such as, \textit{mutual exclusion}, \textit{deadlock} 
 and \textit{starvation freedom}, have been model checked with the traffic 
 containing seven vehicles and spaces on both lanes.
-We have encountered the state explosion problem when we add more vehicle on two lanes.
+We have encountered the state explosion problem when we add more vehicle (or space) on two lanes.
 In the future, we need to use theorem proving, such as CafeOBJ~\cite{DiaconescuF98}, 
-to prove our abstract protocol enjoys some desired properties in general.
+to prove our merging protocol enjoys some desired properties in general.
 
 
 % An example of a floating figure using the graphicx package.
