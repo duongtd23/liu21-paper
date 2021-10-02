@@ -166,7 +166,7 @@ mod MERGING is
 
   --- checked
 
-  crl [prioritized_T_crossing] : 
+  crl [T_crossing] : 
     {(vehicleCrossing: false) (mode: M) (lane[through]: (VI ; VS)) (v[VI]: through,VeSt) OCs} 
   => {(vehicleCrossing: true) (mode: M) (lane[through]: (VI ; VS)) (v[VI]: through,crossing) OCs} 
   if (M =/= fairN) /\ (VeSt == approaching or VeSt == stopped) .

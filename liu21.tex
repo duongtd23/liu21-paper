@@ -363,6 +363,10 @@
 %\usepackage{microtype}
 %\usepackage{algorithm}
 %\usepackage{algorithmic}
+\usepackage{tikz}
+
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+            \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
 
 %\def\IEEEbibitemsep{2pt plus .5pt}
 \IEEEoverridecommandlockouts
@@ -932,22 +936,37 @@ autonomous vehicles. The revised version of the AR merging protocol is
 called our merging protocol (or our protocol) in the present paper.
 Each vehicle in our protocol is attached to one of five statuses:
 \textit{running}, \textit{approaching}, \textit{stopped},
-\textit{crossing}, or \textit{crossed}.  When a vehicle
-is far away from the merge point, its status is running. When a
-vehicle gets close to the merge point, its status changes to
-approaching from running. When a vehicle stops before the merge point,
-its status is stopped. When a vehicle enters the
-merge point, its status changes to crossing from approaching or stopped. 
-When a vehicle has passed through the merge point, its
-status changes to crossed from crossing. We suppose that vehicles
-whose statuses are approaching, or stopped on one lane never
-pass over any other vehicles. We use a boolean variable to check whether
-the vehicle is in the merge point or not. To this end, we need to use V2V
-communications. Such vehicles can be regarded as making a virtual
-queue of vehicles. As the AR merging protocol, there are two modes
-(prioritized mode and fair mode) in our protocol. Initially,
-we suppose that the system is in prioritized mode, the boolean variable is false
-and each vehicle is in running.
+\textit{crossing} and \textit{crossed}.  When a vehicle is far away
+from the merge point, its status is running. When a vehicle gets close
+to the merge point, its status changes to approaching from
+running. When a vehicle stops before the merge point, its status is
+stopped. When a vehicle enters the merge point, its status changes to
+crossing from approaching or stopped.  When a vehicle has passed
+through the merge point, its status changes to crossed from
+crossing. We suppose that vehicles whose statuses are approaching or
+stopped on one lane never pass over any other vehicles. To this end,
+we need to use V2V communications. Such vehicles can be regarded as
+making a virtual queue of vehicles. There are two virtual queues for
+the through lane and the non-through lane, respectively, in our
+protocol. As the AR merging protocol, there are two modes (prioritized
+mode and fair mode) in our protocol. We suppose that there is a sensor
+available that lets each vehicle in such a virtual queue know whether
+there is a vehicle crossing the merge point.  When the number of the
+through lane vehicles that constitute the virtual queue on the through
+lane is greater then a specific number (or the traffic is congested),
+the protocol in fair mode. Otherwise, the protocol is in prioritized
+mode.  When the protocol is in fair mode, the protocol is in either
+the through lane's turn or the non-through lane's turn. If the
+protocol is in the through lane's turn, the thorugh lane is given a
+higher priority; if the protocol is in the non-through lane's turn,
+the non-through lane is given a higher priority. Through lane vehicles
+and non-through vehicles are allowed to enter the merge point
+alternately in this way when the protocol is in fair mode. Initially,
+we suppose that the protocol is in prioritized mode and each vehicle
+is in running, which implies that there is no vehicle crossing the
+merge point and both virtual queues are empty.
+
+% We use a boolean variable to check whether the vehicle is in the merge point or not. 
 
 In our protocol, there are three cases in which a non-through lane
 vehicle is allowed to enter the merge point: (i) no through lane
@@ -957,103 +976,101 @@ space between some two adjacent vehicles (prioritized or fair mode); (iii) throu
 non-through lane vehicles enter the merge point alternately when the
 traffic of the through lane is congested (fair mode).
 
+
 \begin{figure}[h]
 \begin{center}
 \scalebox{0.36}{\includegraphics{Pictures/throughLane.pdf}}
 \end{center}
-\caption{Transition of a through lane vehicle's status}
+\caption{Change of the staus of a through lane vehicle}
 \label{throughLaneStatus}
 \end{figure}
 
-Fig.~\ref{throughLaneStatus} visualizes the change of the status
-of a through lane vehicle.  Each arrow represents the change of the
-vehicle status from one value to another if the condition (or the
-trigger event) denoted by the number attached to the arrow is
-satisfied.  Each condition (or trigger event) is:
+Fig.~\ref{throughLaneStatus} visualizes the change of the status of a
+through lane vehicle.  Each arrow represents the change of the vehicle
+status from one status to another if the condition and/or trigger
+event denoted by the number attached to the arrow is satisfied and/or
+occurs.  Each condition and/or trigger event is as follows:
+
 \begin{itemize}[]
     \item[1)] The vehicle gets close to the merge point. %1
-    \item[2)] Some vehicle is in the merge point. %2
-    \item[3)] The system is in fair mode and there is non-through lane vehicle's turn. %3
-    \item[4)] The system is in prioritized mode. The vehicle either approaching or stopped 
-    can enter the merge point. %4
-    \item[5)] The system is in fair mode and through lane vehicle's turn. The vehicle either 
-    approaching or stopped can enter the merge point. %5
-    \item[6)] The system is in prioritized mode. %6
-    \item[7)] The system is in fair mode and there exists a non-through lane vehicle approaching the 
-    merge point. %7
-    \item[8)] No vehicle on non-through lane.
-    \item[1')] A space appears in through lane. %1' 
-    \item[2')] A space is a top element of through lane, and there exists some vehicle 
-    is in non-through lane. %2' 
-    \item[3')] Some space is top element of through lane. %3'
+    \item[2)] The protocol is in prioritized mode and there is a vehicle in the merge point, when the top through lane vehicle whose status is approaching stops before the merge point. %2
+    \item[3)] The protocol is in fair mode and the current turn is the non-through lane's, when the top through lane vehicle whose status is approaching stops before the merge point. %3
+    \item[4)] The protocol is in fair mode, the current turn is the through lane's and there is a vehicle in the merge point, when the top through lane vehicle whose status is approaching stops before the merge point. %3
+    \item[5)] The protocol is in prioritized mode and there is no vehicle in the merge point, when the top through lane vehicle whose status is either approaching or stopped starts crossing the merge point. %4
+    \item[6)] The protocol is in fair mode, the current turn is the through lane's and there is no vehicle in the merge point, when the top through lane vehicle whose status is either approaching or stopped starts crossing the merge point. %5
+    \item[7)] The protocol is in fair mode, the current turn is the non-through lane's, there is no vehicle in the merge point and there is no non-through lane vehicle whose status is either approaching or stopped, when the top through lane vehicle whose status is stopped starts crossing the merge point. %6
+    \item[8)] The vehicle completes the crossing. %7
 \end{itemize}
 
-When a system is in fair mode (or the traffic is congested), the number of the through lane
-vehicles that constitute the virtual queue on the through lane is
-greater then a specific number. Otherwise, the system is in prioritized mode.
-Note that the through lane vehicles that constitute the virtual queue on the
-through lane are in approaching or stopped or crossing.
-It refers that only the through lane vehicles that constitute the virtual queue
-on the through lane can affect the system. Furhtermore, we also define two turns 
-for through and non-through lane vehicle in the fair mode.
-
-Fig.~\ref{space} visualizes two cases that a non-through lane vehicle can enter
-the merge point when the top of the through lane is a space.
-The blue circle
-represents the non-through lane vehicle, the red circle represents the
-through lane vehicles, and the white circle represents a space. The green
-area denotes the merge point. Each vehicle or space is attached to a
-different number.
-A non-through lane vehicle whose status is approaching or stopped on the top through lane
-can enter the merge point even the system is in prioritized or fair mode.
-Let us note that space is only used in through lane.
+Fig.~\ref{space} visualizes cases that a non-through lane vehicle can
+enter the merge point when the protocol is in prioritized mode or the
+protocol is in fair mode and in the through lane's turn, when there is
+enough space on the through lane before the merge point.  We deal with
+space as a dummy vehicle (called a space) on the through lane.  The
+blue circle represents the non-through lane vehicle, the red circle
+represents the through lane vehicles, and the white circle represents
+a space. The green area denotes the merge point. Each vehicle or space
+is attached to a different number.  The non-through lane vehicle
+{\scriptsize\circled{1}} whose status is approaching or stopped can
+enter the merge point if there is a space {\scriptsize\circled{2}}
+just before the merge point on the through lane even though the
+protocol is in prioritized mode or the protocol is in fair mode and in
+the through lane's turn, when the though lane is given a higher
+priority. Let us note that dummy vehicles representing space are only
+used for the though lane.
 
 \begin{figure}[h]
-	\begin{center}
-		\scalebox{0.28}{\includegraphics{Pictures/space.pdf}}
-	\end{center}
-	\caption{Two cases for the non-through lane vehicle entering the merge point}
-	\label{space}
+\begin{center}
+\scalebox{0.28}{\includegraphics{Pictures/space.pdf}}
+\end{center}
+\caption{Cases that a non-through lane vehicle can enter the merge point}
+\label{space}
 \end{figure}
 
 \begin{figure}[h]
 \begin{center}
 \scalebox{0.36}{\includegraphics{Pictures/nonThroughLane.pdf}}
 \end{center}
-\caption{Transition of a non-through lane vehicle's status}
+\caption{Change of the status of a non-through lane vehicle}
 \label{nonThroughLaneStatus}
 \end{figure}
 
-Fig.~\ref{nonThroughLaneStatus} visualizes the change of the status
-of a non-through lane vehicle.  Each arrow represents the change of the
-vehicle status from one value to another if the condition (or the
-trigger event) denoted by the character attached to the arrow is
-satisfied.  Each condition (or trigger event) is:
+Fig.~\ref{nonThroughLaneStatus} visualizes the change of the status of
+a non-through lane vehicle.  Each arrow represents the change of the
+vehicle status from one status to another if the condition and/or trigger
+event denoted by the number attached to the arrow is satisfied and/or
+occurs.  Each condition and/or trigger event is as follows:
 
 \begin{itemize}
   \item[a)] The vehicle gets close to the merge point. 
-  \item[b)] Some vehicle is in the merge point. 
-  \item[c)] The system is in fair mode and there is through lane vehicle's turn. 
-  \item[d)] The system is in prioritized mode and no vehicle on through lane. The vehicle either 
-  approaching or stopped can enter the merge point.
-  \item[e)] The system is in fair mode and non-through lane vehicle's turn. The vehicle either 
-  approaching or stopped can enter the merge point. 
-  \item[f)] The top of through lane is space (refer to condition 2'). 
-  \item[g)] The system is in prioritized mode.
-  \item[h)] The system is in fair mode. 
+  \item[b)] The protocol is in fair mode, the protocol is in the non-through lane's turn and there is a vehicle in the merge point, when the top non-through lane vehicle whose status is approaching stops before the merge point.
+  \item[c)] The protocol is in fair mode and there is through lane's turn, when the top non-through lane vehicle whose status is approaching stops before the merge point.
+  \item[d)] The protocol is in prioritized mode, when the top non-through lane vehicle whose status is approaching stops before the merge point.
+  \item[e)] The protocol is in fair mode and in the non-through lane's turn and there is not vehicle in the merge point, when the top non-through lane vehicle whose status is either approaching or stopped can enter the merge point.
+  \item[f)] The protocol is in fair mode and in the through lane's turn, there is no vehicle in the merge point and there is enough space just before the merge point, when the top non-through lane vehicle whose status is stopped can enter the merge point.
+  \item[g)] The protocol is in prioritized mode, there is no vehicle in the merge point and there is enough space just before the merge point, when the top non-through lane vehicle whose status is stopped can enter the merge point.
+  \item[h)] The vehicle completes the crossing.
 \end{itemize}
 
-Note that the non-through lane vehicles do not affect the mode of the system even
-some vehicle is in the merge point.
-The details of all conditions will be mentioned in the following section.
+Let us note that the protocol mode (either prioritized mode or fair
+mode) can only be affected by though lane vehicles as above-mentioned.
 
  
 \section{Formal Specification}
  \label{sect_formal}
-We use two queues to maintain the vehicles running on the through lane and non-through lane, respectively.
+We use two queues to maintain virutal queue of the vehicles running 
+on the through lane and non-through lane, respectively.
 In the through lane, each element in the queue can be either a vehicle or a space.
+We define three statuses for the space: $unspace$, $space$, and $yield$ in which
+$unspace$ represents the initial space (not approaching the merge point), 
+$space$ represents the space that is putted into the through lane's queue.
+$yield$ represents the space that is removed from the through lane's queue.
+To check whether some vehicle is in the merge point, we use a boolean variable to control.
+Finally, three mode's values called $prioritized$, $fairT$, $fairN$ are defined to 
+prioritized mode, fair mode and the current turn is the through lane's, fair mode and
+the current turn is non-through lane's, respectively.
 In this paper, a state is expressed as a soup of observable components.
-To formalize the protocol, we use four observable components as follows:
+To formalize the protocol, we use five observable components as follows:
 \begin{itemize}
   \item (\verb!v[!$id$\verb!]:!$position$\verb!,!$vstat$) - $id$ is an ID (a nature number) of 
   a vehicle or a space (we assume that if the ID is less than 100, it represents a vehicle, otherwise it 
@@ -1061,18 +1078,16 @@ To formalize the protocol, we use four observable components as follows:
   $position$ is the lane that the vehicle, or the space (only on through lane) $id$ is located, 
   $vstate$ is the status of the vehicle if it is a 
   vehicle. Initially, $vstate$ is \verb!unspace! if it is a space, or \verb!running! if it is a vehicle.
-  \item (\verb!lane[!$position$\verb!]:!$q$) - $position$ is the through lane or 
-  non-through lane, and $q$ is a queue of vehicles and spaces (only on through lane). 
+
+  \item (\verb!lane[!$position$\verb!]:!$q$) - $position$ is \verb!through! (through lane) or 
+  \verb!noThrough! (non-through lane), and $q$ is a queue of vehicles and spaces.
   Initially, $q$ is \verb!empq!, which denotes an empty queue.
     
   \item (\verb!vehicleCrossing:!$b$) - $b$ is either true or false, indicating that there 
   exists a vehicle crossing the merge point or there does not, respectively. Initially, $b$ is false.
   
   \item (\verb!mode:!$smode$) - $smode$ receives one of the following three values: 
-  \verb!prioritized! indicating that the system is in prioritized mode, 
-  \verb!fairT! indicating that the system is in fair mode and it is the through lane vehicle's turn,
-  \verb!fairN! indicating that the system is in fair mode and it is the non-through lane vehicle's turn.
-  
+  \verb!prioritized!, \verb!fairT!, or \verb!fairN!.
   Initially, $smode$ is \verb!prioritized!.
   
   \item (\verb!gstat! : $gstat$) -  $gstat$ is either \verb!fin! or \verb!nFin!.
@@ -1105,7 +1120,7 @@ the vehicle stops before the merge point, the vehicle is in the merge point and
 the vehicle crossed the merge point.
 
 \subsection{Vehicles approach the merge point}
-The following rules refers to conditions 1), a), and 1'), respectively:
+The following rules in which two first rules refer to conditions 1), and a):
 \begin{small}
   \begin{verbatim}
 crl [approach_T] : 
@@ -1139,13 +1154,13 @@ are Maude variables for mode, lane information (through or non-through), queue, 
 vehicles of top five elements in the queue, it is congested, otherwise 
 it is prioritized. Let us repeat that only through lane vehicles affect
 to the mode so when space is put into queue, it does not change the mode.
-Those rewrite rules change the status of the vehicle or space when they are put into queue.
+The rewrite rule \verb!approach_space! refers to put a dummy vehicle (a space) into the queue.
 
 \subsection{Vehicles stop before the merge point}
-The following rewrite rules refer to conditions 2), 3), b), and c) in which 
-rewrite rule \verb!stopped! corresponds to 2), and b), rewrite rule 
+The following rewrite rules refer to conditions 2), 3), 4), b), c) and d) in which 
+rewrite rule \verb!stopped! corresponds to 2), 4), and b), rewrite rule 
 \verb!fair_T_stopped! corresponds to 3), and \verb!fair_N_stopped! corresponds
-to c).
+to c), and d).
 \begin{small}
   \begin{verbatim}
 rl [stopped] : 
@@ -1183,22 +1198,22 @@ if (M =/= fairN) /\ (VeSt == approaching
 \noindent where \verb!VeSt! is a Maude variable for vehicle status.
 The rewrite rules say that if some vehicle is in the merge point,
 the status of top vehicle on both lane changes to \textit{stopped}.
-If the system is in fair mode and it is through lane vehicle's turn,
+If the protocol is in fair mode and the current turn is through lane's,
 the top of non-through lane changes to \textit{stopped}. For the case 
-non-through lane vehicle's turn, it works similarlly.
-For non-through lane vehicles, there has one more case such that the system
+that the current turn is non-through lane's, it works similarlly.
+For non-through lane vehicles, there has one more case such that the protocol
 is in prioritized mode, if there exists one vehicle on through lane, 
 the non-through lane vehicle must stop.
 
 \subsection{Vehicle enters the merge point}
-The following rewrite rules refer to conditions 2', 3', 4), 5), d), e), and f)
-in which \verb!prioritized_T_crossing! corresponds to 4) and 5), \verb!prioritized_N_crossing!
-corresponds to d), \verb!fair_N_crossing! corresponds to e), \verb!N_space! 
-corresponds to f) and 2'), and \verb!del_space! refers to 3'.
+The following rewrite rules refer to conditions 5), 6), e), f), and g)
+in which \verb!T_crossing! corresponds to 5), 6), \verb!prioritized_N_crossing!
+corresponds to g), \verb!fair_N_crossing! corresponds to e), \verb!N_space! 
+corresponds to f) and g).
 
 \begin{small}
   \begin{verbatim}
-crl [prioritized_T_crossing] : 
+crl [T_crossing] : 
  {(vehicleCrossing: false) (mode: M) 
   (lane[through]: (VI ; VS)) 
   (v[VI]: through,VeSt) OCs} 
@@ -1255,17 +1270,22 @@ rl [del_space] :
 \end{small}
 
 Let us consider the rewrite rule \verb!N_space!, it is a case such that
-the top element of the through lane is space, then if there exists a 
+the top through lane's vehicle is a space, then if there exists a 
 non-through lane vehicle, it can enter the merge point. After that, 
 the space is removed. Note that, we update the mode because the queue
-on through lane has been modified. The rewrite rule \verb!del_space! deletes 
-the top element of through lane and update the mode.
-The other rewrite rules work similarly.
+on through lane has been modified. There exists one case such that no
+vehicle is on through lane, this case also refers to condition g).
+To handle a case such that the top through lane's vehicle is a space, we design
+the rule \verb!del_space! to control it. This rule removes the space and
+updates the protocol mode.
+The remaining rewrite rules work similarly.
+We do not consider the condition 7) because this case never happens when we update
+the mode. The situation is explained in the next section.
 
 \subsection{Vehicle crossed the merge point}
-The following rewrite rules refers to remaining transitions 6),7),8), g), and h) in which
-\verb!prioritized_crossed! corresponds to 6) and g), \verb!N_crossed! corresponds to h),
-\verb!fair_T_crossed1! corresponds to 7), and \verb!fair_T_crossed2! corresponds to 8).
+The following rewrite rules refers to remaining transitions 8) and h) in which
+\verb!prioritized_crossed!, \verb!fair_T_crossed1!, and \verb!fair_T_crossed2!
+correspond to 8), \verb!prioritized_crossed!, and \verb!N_crossed! correspond to h).
 
 \begin{small}
   \begin{verbatim}
@@ -1314,24 +1334,30 @@ rl [fair_T_crossed2] :
   (lane[noThrough]: empq) OCs} .    
   \end{verbatim}
 \end{small}
- 
-In prioritized mode (\verb!prioritized_crossed!), both lane do not affect the mode so we only
+
+After the queue is updated by removing the top element, we need to update the protocol mode also.
+In prioritized mode (\verb!prioritized_crossed!), both lanes do not affect the mode so we only
 update the vehicle's status.
 In fair mode (\verb!N_crossed!), \verb!FairT! is set for non-through lane vehicle even 
-it is through lane vehicle's turn or non-through lane vehicle's turn.
+the current turn is through lane's or non-through lane's.
 Note that the non-through lane vehicle can enter the merge point in 
-through lane vehicle's turn when condition f) or 2') is satisfied.
+through lane's turn when condition f) is satisfied.
 
-Let us consider the rewrite rule \verb!fair_T_crossed1! (in case the condition
-7) is satisfied), we check the traffic except for the vehicle in the merge point.
-If it is still congested, the mode is updated to non-through lane vehicle's turn,
-otherwise, the system returns to prioritized mode. In the rewrite rule 
-\verb!fair_T_crossed2! based on condition 8), we update the \verb!mode! by checking the 
-traffic except for the vehicle in the merge point.
-The update of the system is same as the rewrite rule \verb!fair_T_crossed1!.
+Let us consider the rewrite rule \verb!fair_T_crossed1!.
+In the fair mode, and there exists a non-through lane vehicle approaching or stopped before the merge point,
+then we check the traffic except for the vehicle in the merge point.
+If it is still congested, the mode is updated to non-through lane's turn,
+otherwise, the protocol returns to prioritized mode. 
+
+In the rewrite rule \verb!fair_T_crossed2! in which there is no vehicle on non-through lane, 
+we update the \verb!mode! by checking the traffic except for the vehicle in the merge point.
+In this case, if the traffic is congested, the current turn is still updated to through lane's,
+otherwise, the protocol mode is prioritized.
 Please go to the webpage shown in the Sect.~\ref{sect_intro} to read fully our specification.
  
-
+\verb!fair_T_crossed1! and \verb!fair_T_crossed2! prevent the condition 7) happens in the protocol.
+The reason is if the protocol is fair more and the current turn is non-through lane's,
+there must have at least one non-through lane vehicle approaching or stopped before the merge point.
 
  
 \section{Model Checking}
