@@ -5,25 +5,41 @@
     )
 ***
 
+fmod ID is
+  pr NAT .
+  pr BOOL .
+  sorts VId DId V&DId .
+  subsort VId DId < V&DId .
+  op v : Nat -> VId [ctor] .
+  op d : Nat -> DId [ctor] .
+  op isV : V&DId -> Bool .
+  var Z : V&DId .
+  var Y : VId .
+  eq isV(Y) = true .
+  eq isV(Z) = false [owise] .
+endfm
+
+
 fmod SMODE is 
   sort SMode .
   ops fairT fairN prioritized : -> SMode .
 endfm
 
 fmod QUEUE is
-  pr NAT .
+  pr ID .
   sort Queue .
-  subsort Nat < Queue .
+  subsort V&DId < Queue .
   op empq : -> Queue [ctor] .
   op _;_ : Queue Queue -> Queue [ctor assoc id: empq] .
   op #(_,_,_) : Queue Nat Nat -> Nat .
   var Q : Queue .
-  vars X Y Z : Nat .
+  vars X Y : Nat .
+  var Z : V&DId .
 
   eq #(empq, X, Y) = X .
   eq #(Q, X, 0) = X .
-  ceq #((Z ; Q), X, Y) = #(Q, X, sd(Y,1)) if Z >= 100 .
-  ceq #((Z ; Q), X, Y) = #(Q, s(X), sd(Y,1)) if Z < 100 .
+  ceq #((Z ; Q), X, Y) = #(Q, X, sd(Y,1)) if isV(Z) == false .
+  ceq #((Z ; Q), X, Y) = #(Q, s(X), sd(Y,1)) if isV(Z) == true .
 endfm
 
 fmod SOUP{D :: TRIV} is
@@ -61,12 +77,11 @@ endfm
 fmod OCOMP is
   pr GSTATUS .
   pr VSTATUS .
-  pr NAT .
   pr QUEUE .
   pr SMODE .
   sort OComp .
   op (gstat:_) : GStat -> OComp [ctor] .
-  op (v[_]:_,_) : Nat Lane VStat -> OComp [ctor] .
+  op (v[_]:_,_) : V&DId Lane VStat -> OComp [ctor] .
   op (lane[_]:_) : Lane Queue -> OComp [ctor] .
 
   op (vehicleCrossing:_) : Bool -> OComp [ctor] . --- is there a vehicle crossing the merge point or not
@@ -85,8 +100,9 @@ fmod OCOMP-SOUP is
   op letCross : Nat Soup{OComp} -> Soup{OComp} .
   var GS : GStat .
   var L : Lane .
-  var N : Nat .
-  var VI : Nat .
+  --- var N : Nat .
+  --- var VI : Nat .
+  var VI : V&DId .
   var B1 B2 B3 B4 B5 : Bool .
   var Q : Queue .
   var OCs : Soup{OComp} .
@@ -109,10 +125,18 @@ fmod CONFIG is
   sorts Config .
   op {_} : Soup{OComp} -> Config [ctor] .
   ops init init2 : -> Config .
+  ***(
   eq init = {(gstat: nFin) (lane[through]: empq) (lane[noThrough]: empq) 
               (v[101]: through,unspace) (v[102]: through,unspace)
               (v[4]: through,running) (v[5]: through,running) (v[6]: through,running) (v[7]: through,running)
               (v[1]: noThrough,running) (v[2]: noThrough,running) (v[3]: noThrough,running) 
+              (vehicleCrossing: false) (mode: prioritized)
+              } .
+              )***
+  eq init = {(gstat: nFin) (lane[through]: empq) (lane[noThrough]: empq) 
+              (v[d(1)]: through,unspace) (v[d(2)]: through,unspace)
+              (v[v(4)]: through,running) (v[v(5)]: through,running) (v[v(6)]: through,running) (v[v(7)]: through,running)
+              (v[v(1)]: noThrough,running) (v[v(2)]: noThrough,running) (v[v(3)]: noThrough,running) 
               (vehicleCrossing: false) (mode: prioritized)
               } .
 endfm
@@ -120,7 +144,8 @@ endfm
 mod MERGING is
   inc CONFIG .
   vars L LN LT : Lane .
-  vars VI VI' VI'' VI''' NT : Nat .
+  --- vars VI VI' VI'' VI''' NT : Nat .
+  vars VI VI' VI'' VI''' NT : V&DId .
   vars VS VS' : Queue .
   vars OCs OCs' : Soup{OComp} .
   vars B1 B2 B3 B4 B5 : Bool .
@@ -235,10 +260,10 @@ mod MERGING is
 endm
 
 --- no deadlock
-search [1] in MERGING : init =>! {OCs} .
+--- search [1] in MERGING : init =>! {OCs} .
 
 --- mutual exclusion
-search [1] in MERGING : init =>* {(v[VI]: L, crossing) (v[VI']: LN, crossing) OCs} such that VI =/= VI' .
+--- search [1] in MERGING : init =>* {(v[VI]: L, crossing) (v[VI']: LN, crossing) OCs} such that VI =/= VI' .
 
 
 in model-checker .
@@ -250,13 +275,13 @@ mod MERGING-PREDS is
   ops Fin : -> Prop .
   var OCs : Soup{OComp} .
   var PROP : Prop .
-  vars VI : Nat .
+  vars VI : V&DId .
   vars L : Lane .
   eq {(gstat: fin) OCs} |= Fin = true .
   eq {OCs} |= PROP = false [owise] .
 
-  op want : Nat -> Prop .
-  op passed : Nat -> Prop .
+  op want : V&DId -> Prop .
+  op passed : V&DId -> Prop .
   eq {(v[VI]: L,approaching) OCs} |= want(VI) = true .
   eq {(v[VI]: L,crossed) OCs} |= passed(VI) = true .
 
@@ -269,12 +294,12 @@ mod MERGING-CHECK is
   op halt  : -> Formula .
   eq halt = <> Fin .
 
-  op lofree0 : Nat -> Formula .
+  op lofree0 : V&DId -> Formula .
   op lofree : -> Formula .
-  vars VI : Nat .
+  vars VI : V&DId .
   eq lofree0(VI) = (want(VI) |-> passed(VI)) .
-  eq lofree = lofree0(1) /\ lofree0(2) /\ lofree0(3) /\
-              lofree0(4) /\ lofree0(5) /\ lofree0(6) /\ lofree0(7) .
+  eq lofree = lofree0(v(1)) /\ lofree0(v(2)) /\ lofree0(v(3)) /\
+              lofree0(v(4)) /\ lofree0(v(5)) /\ lofree0(v(6)) /\ lofree0(v(7)) .
 endm
 
 red in MERGING-CHECK : modelCheck(init,lofree) .
