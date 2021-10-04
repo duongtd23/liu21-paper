@@ -12,11 +12,6 @@ fmod ID is
   subsort VId DId < V&DId .
   op v : Nat -> VId [ctor] .
   op d : Nat -> DId [ctor] .
-  op isV : V&DId -> Bool .
-  var Z : V&DId .
-  var Y : VId .
-  eq isV(Y) = true .
-  eq isV(Z) = false [owise] .
 endfm
 
 
@@ -36,10 +31,11 @@ fmod QUEUE is
   vars X Y : Nat .
   var Z : V&DId .
 
+  var N : Nat .
   eq #(empq, X, Y) = X .
-  eq #(Q, X, 0) = X .
-  ceq #((Z ; Q), X, Y) = #(Q, X, sd(Y,1)) if isV(Z) == false .
-  ceq #((Z ; Q), X, Y) = #(Q, s(X), sd(Y,1)) if isV(Z) == true .
+  eq #((Z ; Q), X, 0) = X .
+  eq #((d(N) ; Q), X, s(Y)) = #(Q, X, Y) .
+  eq #((v(N) ; Q), X, s(Y)) = #(Q, s(X), Y) .
 endfm
 
 fmod SOUP{D :: TRIV} is
@@ -139,6 +135,7 @@ fmod CONFIG is
               (v[v(1)]: noThrough,running) (v[v(2)]: noThrough,running) (v[v(3)]: noThrough,running) 
               (vehicleCrossing: false) (mode: prioritized)
               } .
+              
 endfm
 
 mod MERGING is
